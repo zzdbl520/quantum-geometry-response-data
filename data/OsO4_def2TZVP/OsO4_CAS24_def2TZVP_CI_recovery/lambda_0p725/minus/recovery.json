@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "source_checkpoint": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p725/minus/casscf.chk",
+  "source_summary": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p725/minus/summary.json",
+  "field_vector_au": [
+    0.0,
+    0.0,
+    -0.001
+  ],
+  "ncore": 12,
+  "ncas": 17,
+  "nelecas": [
+    12,
+    12
+  ],
+  "target_casscf_energy_hartree": -387.1134529549495,
+  "recovered_casci_energy_hartree": -387.1134529544439,
+  "energy_difference_hartree": 5.055653673480265e-10,
+  "energy_tolerance_hartree": 5e-09,
+  "ci_path": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/lambda_0p725/minus/ci.npy",
+  "mo_coeff_path": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/lambda_0p725/minus/mo_coeff.npy"
+}

@@ -1,0 +1,19 @@
+{
+  "alpha_axis_au": 30.36379939658218,
+  "alpha_iso_au": 30.36379939658218,
+  "axis": "z",
+  "field_magnitude_au": 0.001,
+  "field_working_group": "C2v",
+  "inferred_zero_field_dipole_au": -2.7569058147491887e-09,
+  "lambda": 0.8,
+  "minus_energy_hartree": -388.6426908782758,
+  "minus_min_active_sv": 0.9999979254845407,
+  "odd_energy_half_difference_hartree": 2.7569058147491887e-12,
+  "plus_energy_hartree": -388.6426908782703,
+  "plus_min_active_sv": 0.999997925639681,
+  "plus_minus_energy_difference_hartree": 5.5138116294983774e-12,
+  "plus_minus_max_natural_occupation_difference": 5.921656252017016e-07,
+  "td_isotropy_used": true,
+  "zero_checkpoint": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_zero/compression/lambda_0p800/casscf.chk",
+  "zero_energy_hartree": -388.6426756963733
+}

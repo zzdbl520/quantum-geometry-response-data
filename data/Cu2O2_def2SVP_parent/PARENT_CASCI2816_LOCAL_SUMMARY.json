@@ -1,0 +1,117 @@
+{
+  "decision": "PARENT_CASCI2816_LOCAL_MINIMUM_VALIDATED",
+  "extrema": {
+    "absolute_vertex_shift_A": 0.0028025643076088347,
+    "parent_CASCI2816": {
+      "a": 77.12393805075963,
+      "b": -270.5808462148886,
+      "c": 345.82760114675233,
+      "curvature_second_derivative": 154.24787610151927,
+      "x": 1.7541949558955614,
+      "y": 108.50182335069726
+    },
+    "source_CAS86": {
+      "a": 77.46008729253106,
+      "b": -272.1943625753963,
+      "c": 347.4939173126782,
+      "curvature_second_derivative": 154.9201745850621,
+      "x": 1.7569975202031702,
+      "y": 108.37150728355124
+    }
+  },
+  "field_step_au": 0.00025,
+  "hard_gates": {
+    "active_electron_count": true,
+    "all_parent_CASCI_states_converged": true,
+    "minimum_location_preserved": true,
+    "parent_alpha_positive_curvature": true,
+    "parent_alpha_vertex_in_local_window": true,
+    "parent_energy_dipole_consistency": true,
+    "parent_field_step_consistency": true,
+    "preflight_passed": true,
+    "singlet_purity": true,
+    "source_alpha_positive_curvature": true,
+    "source_alpha_vertex_in_local_window": true
+  },
+  "interpretation_limit": "This tests whether the local x-polarizability minimum survives a strictly nested parent CASCI space. It is not an orbital-optimized CAS(28,16), dynamic-correlation, double-shell, or basis-limit claim.",
+  "method": "fixed-orbital singlet CASCI(28e,16o)/def2-SVP on independently field-relaxed CASSCF(8e,6o)/def2-SVP source orbitals",
+  "outputs": {
+    "csv": "/scr/zdb/Cu2O2_quantum_geometry/Cu2O2_parent_CASCI2816_local_validation_v1/results/PARENT_CASCI2816_LOCAL_RESPONSE.csv",
+    "json": "/scr/zdb/Cu2O2_quantum_geometry/Cu2O2_parent_CASCI2816_local_validation_v1/results/PARENT_CASCI2816_LOCAL_SUMMARY.json",
+    "pdf": "/scr/zdb/Cu2O2_quantum_geometry/Cu2O2_parent_CASCI2816_local_validation_v1/results/Cu2O2_parent_CASCI2816_local_validation.pdf",
+    "png": "/scr/zdb/Cu2O2_quantum_geometry/Cu2O2_parent_CASCI2816_local_validation_v1/results/Cu2O2_parent_CASCI2816_local_validation.png"
+  },
+  "preferred_gates": {
+    "adjacent_geometry_continuity": true,
+    "target_representation": true
+  },
+  "protocol_hash": "9c65abd54fc16cc5084d212083cdc6e9f102c461603cdc8d2e76adb9ccd54ce6",
+  "response_diagnostics": {
+    "maximum_abs_S2": 1.7280295147870845e-13,
+    "maximum_active_electron_error": 5.826450433232822e-13,
+    "maximum_parent_energy_dipole_relative_discrepancy": 0.0002759648683982595,
+    "maximum_parent_field_step_relative_discrepancy": 9.399800006534334e-05,
+    "minimum_adjacent_geometry_parent_active_sigma": 0.9811893466416871,
+    "minimum_target_parent_active_sigma": 0.9512069395471879
+  },
+  "rows": [
+    {
+      "R_OO_A": 1.7,
+      "parent_CASCI2816_alpha_dipole_five_au": 108.70751641061342,
+      "parent_CASCI2816_alpha_energy_2h_au": 108.73412611545064,
+      "parent_CASCI2816_alpha_energy_five_au": 108.72834354813676,
+      "parent_CASCI2816_alpha_energy_h_au": 108.729800558649,
+      "parent_CASCI2816_energy_dipole_relative_discrepancy": 0.00019155205389586544,
+      "parent_CASCI2816_energy_zero_Eh": -3804.96480793621,
+      "parent_CASCI2816_field_step_relative_discrepancy": 3.9781041667077914e-05,
+      "parent_minus_source_alpha_energy_five_au": 0.10519033821765333,
+      "point": "009",
+      "source_CAS86_alpha_dipole_five_au": 108.62360857358529,
+      "source_CAS86_alpha_energy_2h_au": 108.62377894227393,
+      "source_CAS86_alpha_energy_five_au": 108.62315320991911,
+      "source_CAS86_alpha_energy_h_au": 108.62330964300781,
+      "source_CAS86_energy_dipole_relative_discrepancy": 4.192124273503063e-06,
+      "source_CAS86_energy_zero_Eh": -3804.9639419865566,
+      "source_CAS86_field_step_relative_discrepancy": 4.320410049113015e-06
+    },
+    {
+      "R_OO_A": 1.75,
+      "parent_CASCI2816_alpha_dipole_five_au": 108.47502608556663,
+      "parent_CASCI2816_alpha_energy_2h_au": 108.50918260985054,
+      "parent_CASCI2816_alpha_energy_five_au": 108.50318055114863,
+      "parent_CASCI2816_alpha_energy_h_au": 108.50468243006617,
+      "parent_CASCI2816_energy_dipole_relative_discrepancy": 0.0002594805556758177,
+      "parent_CASCI2816_energy_zero_Eh": -3804.96117460053,
+      "parent_CASCI2816_field_step_relative_discrepancy": 4.147280143610555e-05,
+      "parent_minus_source_alpha_energy_five_au": 0.12788041203748435,
+      "point": "010",
+      "source_CAS86_alpha_dipole_five_au": 108.37621581573369,
+      "source_CAS86_alpha_energy_2h_au": 108.3762945199851,
+      "source_CAS86_alpha_energy_five_au": 108.37530013911115,
+      "source_CAS86_alpha_energy_h_au": 108.37554873432964,
+      "source_CAS86_energy_dipole_relative_discrepancy": 8.449055133066227e-06,
+      "source_CAS86_energy_zero_Eh": -3804.960292390576,
+      "source_CAS86_field_step_relative_discrepancy": 6.881446341720742e-06
+    },
+    {
+      "R_OO_A": 1.8,
+      "parent_CASCI2816_alpha_dipole_five_au": 108.63364989806239,
+      "parent_CASCI2816_alpha_energy_2h_au": 108.67725359275937,
+      "parent_CASCI2816_alpha_energy_five_au": 108.66363724441422,
+      "parent_CASCI2816_alpha_energy_h_au": 108.66703814826906,
+      "parent_CASCI2816_energy_dipole_relative_discrepancy": 0.0002759648683982595,
+      "parent_CASCI2816_energy_zero_Eh": -3804.956541095593,
+      "parent_CASCI2816_field_step_relative_discrepancy": 9.399800006534334e-05,
+      "parent_minus_source_alpha_energy_five_au": 0.148889739648439,
+      "point": "011",
+      "source_CAS86_alpha_dipole_five_au": 108.5144771216638,
+      "source_CAS86_alpha_energy_2h_au": 108.51536353584379,
+      "source_CAS86_alpha_energy_five_au": 108.51474750476578,
+      "source_CAS86_alpha_energy_h_au": 108.51491242647171,
+      "source_CAS86_energy_dipole_relative_discrepancy": 2.491671484241074e-06,
+      "source_CAS86_energy_zero_Eh": -3804.955619594876,
+      "source_CAS86_field_step_relative_discrepancy": 4.157101422144397e-06
+    }
+  ],
+  "schema_version": 1
+}

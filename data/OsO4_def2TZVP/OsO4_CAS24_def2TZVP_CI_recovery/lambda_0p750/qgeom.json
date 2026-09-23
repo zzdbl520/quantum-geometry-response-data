@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "lambda": 0.75,
+  "field_au": 0.001,
+  "alpha_iso_au": 27.789176328951726,
+  "many_electron_overlap_abs": 0.9999629319220983,
+  "many_electron_fidelity": 0.999925865218239,
+  "g_ff_au": 18.53438246993694,
+  "delta_geom_hartree": 0.7496655573506753,
+  "closure_alpha_au": 27.789176328951726,
+  "cross_core_determinant_abs": 0.9999820822148192,
+  "effective_active_min_sv": 0.9999895459254017,
+  "effective_active_max_sv": 1.0000047579190325,
+  "plus_recovery_energy_error_hartree": 1.5870682545937598e-10,
+  "minus_recovery_energy_error_hartree": 1.5910472939140163e-10
+}

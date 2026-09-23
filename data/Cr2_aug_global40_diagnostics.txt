@@ -1,0 +1,37 @@
+Cr2 CASSCF(12,12)/aug-cc-pVTZ global-40 analysis
+Upstream audit: PASS
+Geometries: 40/40
+Finite-field points: 320/320
+Accepted CASSCF states: 680/680
+Component summaries: 80/80
+Failures: 0
+Maximum |<S^2>|: 4.502062365955e-05
+Maximum-|<S^2>| geometry: 4.5000 A
+Maximum active-occupation sum error: 6.052048e-12
+Minimum projected-active singular value: 0.9794541404
+Minimum final-active singular value: 0.9998489812
+Maximum projected-MO orthonormality error: 1.296080e-10
+Minimum wave-function fidelity: 0.9923262406
+Maximum relative alpha field span: 8.643657e-04
+Maximum relative metric field span: 7.748388e-03
+Maximum factorization error: 2.842171e-13 a.u.
+
+R_alpha_min = 1.769322623 A
+R_g_min = 1.798385717 A
+R_Delta_max = 1.819607024 A
+R_Delta_min = 3.675031010 A
+R_g_max = 3.813159727 A
+R_alpha_max = 4.013855375 A
+alpha_max = 243.3833741754 a.u.
+
+At alpha minimum: dln(g)/dR = -0.112758117 A^-1
+At alpha minimum: dln(Delta)/dR = 0.112758117 A^-1
+At alpha minimum: d2ln(alpha)/dR2 = 1.614613749 A^-2
+At alpha maximum: dln(g)/dR = -0.068089988 A^-1
+At alpha maximum: dln(Delta)/dR = 0.068089988 A^-1
+At alpha maximum: d2ln(alpha)/dR2 = -0.210542910 A^-2
+Maximum fitted logarithmic closure: 6.092349e-14 A^-1
+
+Field-model R_alpha_min range: 1.769316994--1.769328260 A
+Field-model R_alpha_max range: 4.012023192--4.015200202 A
+Geometry-model R_alpha_max range: 4.001950821--4.017038080 A

@@ -1,0 +1,10 @@
+H2 FCI quantum-geometry diagnostics
+Maximum relative alpha field-span: 3.315080e-04
+Maximum relative g field-span: 6.376481e-04
+Maximum logarithmic-decomposition closure: 8.937295e-15 A^-1
+Sampled alpha_iso maximum: R=1.800000 A, alpha=12.1430660038 a.u.
+Local-quadratic alpha_iso maximum: R=1.807547 A, alpha=12.1434239216 a.u.
+Sampled g_iso maximum: R=1.850000 A, g=17.3610233225 a.u.
+Local-quadratic g_iso maximum: R=1.844535 A, g=17.3613212655 a.u.
+Sampled Delta_iso minimum: R=1.900000 A, Delta=0.3489318573 Eh
+Local-quadratic Delta_iso minimum: R=1.909288 A, Delta=0.3489223122 Eh

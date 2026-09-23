@@ -1,0 +1,7 @@
+region,quantity,extremum,R_fit_Angstrom,value_fit,R_sampled_Angstrom,fit_window_min_Angstrom,fit_window_max_Angstrom,fit_points,polynomial_degree
+near-equilibrium,alpha_iso,minimum,1.7693226230462729,153.52593887318884,1.7678,1.6896,1.8395,7,2
+near-equilibrium,g_iso,minimum,1.7983857171797577,584.6448873925377,1.8134,1.6896,1.8395,7,2
+near-equilibrium,Delta_geom_iso,maximum,1.8196070237858475,0.13144896646790968,1.8134,1.6896,1.8395,7,2
+long-bond,Delta_geom_iso,minimum,3.6750310096459953,0.08157339066481444,3.7,3.55,3.9676,5,2
+long-bond,g_iso,maximum,3.8131597273597784,1482.757515016051,3.85,3.55,3.9676,5,2
+long-bond,alpha_iso,maximum,4.013855375131131,243.38337417539125,4.0176,3.9676,4.0676,3,2

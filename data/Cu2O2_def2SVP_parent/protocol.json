@@ -1,0 +1,104 @@
+{
+  "project": "Cu2O2_parent_CASCI2816_local_validation_v1",
+  "release": "1.0",
+  "source_root": "/scr/zdb/Cu2O2_quantum_geometry",
+  "source_dataset": "Cu2O2_CAS86_response_pilot_v1",
+  "output_root": "/scr/zdb/Cu2O2_quantum_geometry/Cu2O2_parent_CASCI2816_local_validation_v1",
+  "software": {
+    "python_environment": "osmo4-mokit",
+    "pyscf_version": "2.13.1"
+  },
+  "molecule": {
+    "name": "singlet [Cu2O2(en)2]2+",
+    "charge": 2,
+    "spin": 0,
+    "basis": "def2-svp",
+    "hamiltonian": "all-electron nonrelativistic",
+    "expected_electrons": 140,
+    "expected_spherical_aos": 282
+  },
+  "source_active_space": {
+    "method": "field-relaxed state-specific singlet CASSCF(8e,6o)/def2-SVP",
+    "ncore": 66,
+    "ncas": 6,
+    "nelecas": [
+      4,
+      4
+    ],
+    "core_active_columns": 72,
+    "orbital_array_key": "mo_core_active"
+  },
+  "parent_active_space": {
+    "method": "fixed-orbital singlet CASCI(28e,16o)/def2-SVP on field-relaxed source orbitals",
+    "ncore": 56,
+    "ncas": 16,
+    "nelecas": [
+      14,
+      14
+    ],
+    "promoted_source_core_orbitals": 10,
+    "definition": "exact source CAS(8,6) active span plus ten source-core combinations selected against Cu 3d and O 2p IAOs",
+    "determinant_dimension_Ms0": 14400
+  },
+  "points": {
+    "009": {
+      "R_OO_A": 1.7,
+      "uniform_geometry": "Cu2O2_uniform_CAS86_25point_qgeom_v1/branches/forward/009/Cu2O2_009_forward_CAS86_NO.fch"
+    },
+    "010": {
+      "R_OO_A": 1.75,
+      "uniform_geometry": "Cu2O2_uniform_CAS86_25point_qgeom_v1/branches/forward/010/Cu2O2_010_forward_CAS86_NO.fch"
+    },
+    "011": {
+      "R_OO_A": 1.8,
+      "uniform_geometry": "Cu2O2_uniform_CAS86_25point_qgeom_v1/branches/forward/011/Cu2O2_011_forward_CAS86_NO.fch"
+    }
+  },
+  "finite_field": {
+    "axis": "x",
+    "step_au": 0.00025,
+    "labels": [
+      "x_m2",
+      "x_m1",
+      "zero",
+      "x_p1",
+      "x_p2"
+    ],
+    "hamiltonian_convention": "H(F)=H(0)-mu.F; electronic one-electron term is +F.r and nuclear term is -F.sum(ZR)"
+  },
+  "resources": {
+    "threads": 64,
+    "total_memory_mb": 100000,
+    "casci_memory_mb": 90000,
+    "fci_memory_mb": 80000,
+    "pyscf_verbose": 4
+  },
+  "casci": {
+    "fci_conv_tol_Eh": 5e-13,
+    "fci_max_cycle": 120,
+    "fci_max_space": 30,
+    "spin_penalty_shift": 0.2,
+    "target_S2": 0.0
+  },
+  "gates": {
+    "geometry_match_max_atom_displacement_A": 2e-06,
+    "CuCu_axis_alignment_abs_min": 0.999,
+    "source_orbital_metric_max_error": 5e-06,
+    "parent_orbital_metric_max_error": 1e-07,
+    "source_active_nesting_sigma_min": 0.999999,
+    "target_parent_active_sigma_min": 0.9,
+    "preferred_target_parent_active_sigma_min": 0.95,
+    "field_parent_active_sigma_h_min": 0.995,
+    "field_parent_active_sigma_2h_min": 0.99,
+    "field_source_active_sigma_min": 0.995,
+    "adjacent_geometry_parent_active_sigma_min": 0.9,
+    "preferred_adjacent_geometry_parent_active_sigma_min": 0.95,
+    "field_step_relative_max": 0.03,
+    "energy_dipole_relative_max": 0.03,
+    "alpha_vertex_min_R_A": 1.7,
+    "alpha_vertex_max_R_A": 1.8,
+    "baseline_vertex_shift_max_A": 0.05,
+    "max_abs_S2": 1e-06,
+    "max_active_electron_error": 1e-08
+  }
+}

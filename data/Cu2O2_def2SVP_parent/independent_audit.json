@@ -1,0 +1,50 @@
+{
+  "absolute_vertex_shift_A": 0.0028025643076088347,
+  "all_hard_gates_pass": true,
+  "all_preferred_gates_pass": true,
+  "alpha_correction_au": [
+    0.10519033821765333,
+    0.12788041203748435,
+    0.148889739648439
+  ],
+  "alpha_relative_correction_percent": [
+    0.09683970231868365,
+    0.1179977466021652,
+    0.13720691709843402
+  ],
+  "curvature_relative_change_percent": -0.4339644499778861,
+  "decision": "PARENT_CASCI2816_LOCAL_MINIMUM_VALIDATED",
+  "parent_fit_recalculated": {
+    "a": 77.12393805075963,
+    "b": -270.5808462148886,
+    "c": 345.82760114675233,
+    "curvature_second_derivative": 154.24787610151927,
+    "x": 1.7541949558955614,
+    "y": 108.50182335069724
+  },
+  "parent_minus_source_zero_field_energy_kcal_per_mol": [
+    -0.5433916115804894,
+    -0.5535951042119706,
+    -0.5782504300763021
+  ],
+  "protocol_hash": "9c65abd54fc16cc5084d212083cdc6e9f102c461603cdc8d2e76adb9ccd54ce6",
+  "response_diagnostics": {
+    "maximum_abs_S2": 1.7280295147870845e-13,
+    "maximum_active_electron_error": 5.826450433232822e-13,
+    "maximum_parent_energy_dipole_relative_discrepancy": 0.0002759648683982595,
+    "maximum_parent_field_step_relative_discrepancy": 9.399800006534334e-05,
+    "minimum_adjacent_geometry_parent_active_sigma": 0.9811893466416871,
+    "minimum_target_parent_active_sigma": 0.9512069395471879
+  },
+  "source_fit_recalculated": {
+    "a": 77.46008729253106,
+    "b": -272.1943625753963,
+    "c": 347.4939173126782,
+    "curvature_second_derivative": 154.9201745850621,
+    "x": 1.7569975202031702,
+    "y": 108.37150728355124
+  },
+  "states_completed": 15,
+  "status": "PASS_INDEPENDENT_RECALCULATION",
+  "vertex_shift_as_percent_of_0.05_A_grid": 5.605128615217669
+}

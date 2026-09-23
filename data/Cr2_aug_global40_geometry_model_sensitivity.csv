@@ -1,0 +1,26 @@
+quantity,extremum,protocol,fit_window_min_Angstrom,fit_window_max_Angstrom,polynomial_degree,R_fit_Angstrom
+alpha_min,minimum,3-point quadratic,1.7417,1.7939,2,1.7681942104116823
+alpha_min,minimum,5-point quadratic,1.7157,1.8134,2,1.7686906123860424
+alpha_min,minimum,7-point quadratic,1.6896,1.8395,2,1.7693226230462729
+alpha_min,minimum,9-point quadratic,1.6636,1.8655,2,1.770127396759734
+g_min,minimum,3-point quadratic,1.7939,1.8395,2,1.808350056248468
+g_min,minimum,5-point quadratic,1.7678,1.8655,2,1.7994427110994407
+g_min,minimum,7-point quadratic,1.7417,1.8981,2,1.7999398826369815
+g_min,minimum,9-point quadratic,1.7157,1.9502,2,1.8025272699874253
+Delta_max,maximum,3-point quadratic,1.7939,1.8395,2,1.8210138129249536
+Delta_max,maximum,5-point quadratic,1.7678,1.8655,2,1.8270361169791034
+Delta_max,maximum,7-point quadratic,1.7417,1.8981,2,1.8276474023390443
+Delta_max,maximum,9-point quadratic,1.7157,1.9502,2,1.8290839666097793
+Delta_min,minimum,3-point quadratic,3.55,3.85,2,3.6755470560944783
+Delta_min,minimum,5-point quadratic,3.3964,3.9176,2,3.6807659340637184
+Delta_min,minimum,7-point quadratic,3.2987,3.9676,2,3.6850148469033233
+Delta_min,minimum,9-point quadratic,3.201,4.0176,2,3.692871206110798
+g_max,maximum,3-point quadratic,3.7,3.9176,2,3.813871951761592
+g_max,maximum,5-point quadratic,3.55,3.9676,2,3.8131597273597784
+g_max,maximum,7-point quadratic,3.3964,4.0176,2,3.8194284190089127
+g_max,maximum,9-point quadratic,3.2987,4.0676,2,3.8258844745943237
+alpha_max,maximum,local 3-point quadratic,3.9676,4.0676,2,4.013855375131131
+alpha_max,maximum,fine 5-point quartic,3.9176,4.1176,4,4.017038079613056
+alpha_max,maximum,7-point cubic,3.85,4.3,3,4.001950821240095
+alpha_max,maximum,9-point cubic,3.7,4.5,3,4.007936824775289
+alpha_max,maximum,9-point quartic,3.7,4.5,4,4.004503620055799

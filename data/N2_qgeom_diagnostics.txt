@@ -1,0 +1,34 @@
+N2 CASSCF(6,6)/aug-cc-pVTZ quantum-geometry diagnostics
+Completed geometries: 38 / 38
+Summary rows: 76 (expected 76)
+Finite-field rows: 304 (expected 304)
+Accepted CASSCF states: 646; all converged: True
+Two-step retry states: 91
+Legacy states without optimizer label: 51
+Historical failure rows: 20
+Historical-failure/final-grid intersection: []
+Maximum isotropic alpha field-span (all R): 5.353129e-05
+Maximum isotropic g field-span (all R): 1.704738e-03
+Maximum isotropic alpha field-span (1.5--2.5 A): 5.353129e-05
+Maximum isotropic g field-span (1.5--2.5 A): 1.704738e-03
+Maximum component alpha fit RMS: 1.258215e-04 a.u.
+Maximum component g fit RMS: 7.699608e-03 a.u.
+Field-model Ralpha span: 3.682318e-05 A
+Field-model Rg span: 8.749409e-04 A
+Field-model RDelta span: 1.215676e-03 A
+Maximum wavefunction-norm deviation: 4.907186e-14
+Maximum zero-field active-occupation sum error: 6.217249e-15
+Maximum projected AO-metric orthogonality error: 1.876177e-11
+Minimum projected-active singular value: 0.9993137039
+Minimum final-active singular value: 0.9990906627
+Maximum logarithmic-decomposition closure: 7.216450e-15 A^-1
+Maximum translated-origin longitudinal linear-term residual: 1.794227e-09 Eh/(a.u. field)
+Sampled alpha_iso maximum: R=1.876923 A, alpha=17.0117779089 a.u.
+Five-point local-quadratic alpha_iso maximum: R=1.869322 A, alpha=17.0069455303 a.u.
+Sampled g_iso maximum: R=1.969231 A, g=17.2073481277 a.u.
+Five-point local-quadratic g_iso maximum: R=1.998409 A, g=17.2174743161 a.u.
+Sampled Delta_iso minimum: R=2.153846 A, Delta=0.4844038272 Eh
+Five-point local-quadratic Delta_iso minimum: R=2.146682 A, Delta=0.4843026252 Eh
+Characteristic-geometry separation Rg-Ralpha: 0.129087 A
+Characteristic-geometry separation RDelta-Rg: 0.148273 A
+Characteristic-geometry separation RDelta-Ralpha: 0.277360 A

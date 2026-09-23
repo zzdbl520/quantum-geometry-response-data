@@ -1,0 +1,12 @@
+{
+  "method": "orbital-relaxed state-specific singlet CASSCF(8e,6o)/def2-TZVP",
+  "PES_minimum_A": 1.6238986411788814,
+  "alpha_xx_minimum_A": 1.7490527364361133,
+  "PES_response_separation_A": 0.12515409525723187,
+  "field_metric_minimum_A": 1.7476232157687641,
+  "geometric_scale_maximum_A": 1.7467645276657409,
+  "extremum_estimator": "local_three_point_quadratic on 0.05-A grid",
+  "normalization_reference": "local-quadratic values at fitted alpha_xx minimum",
+  "normalization_reference_R_A": 1.7490527364361133,
+  "normalization_nearest_grid_point": "010"
+}
