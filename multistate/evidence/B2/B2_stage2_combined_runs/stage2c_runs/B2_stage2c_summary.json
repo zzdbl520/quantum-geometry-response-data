@@ -1,0 +1,32 @@
+{
+  "field_state_tasks": 234,
+  "max_abs_s2_error": 5.426770144367765e-13,
+  "max_accepted_stationary_plateau_gradient": 0.0,
+  "merge_sources": {
+    "addon": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs",
+    "addon_hybrid_version": "3.2-baseline-aware-direct-mu-hybrid",
+    "base": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p8/B2_stage2c_runs",
+    "base_hybrid_version": "3.2-baseline-aware-direct-mu-hybrid"
+  },
+  "method": "equal-root SA3-CASSCF(6,8)/aug-cc-pVTZ polar-transport finite field",
+  "min_transport_singular_value": 0.9999730090168296,
+  "outputs": {
+    "field_states": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs/field_states.csv",
+    "paired_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs/transported_field_pairs.csv",
+    "response_limits": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs/transported_response_limits.csv"
+  },
+  "paired_field_rows": 117,
+  "protocol_version": "3.0-polar-transport-SA3",
+  "response_limit_rows": 39,
+  "scientific_note": "The finite-field Hamiltonian is transported as a complete SA3 frame. Root labels are never assigned in C1. At Rc the transverse response is reported as a |F| cusp, not as a finite polarizability or finite metric.",
+  "stage1b_crossing_R_Angstrom": 1.9441854605348607,
+  "status": "merged_for_hybrid_finalize",
+  "targeted_stationary_plateau_rows": 0,
+  "warnings": [
+    "12 zero-field limits failed validation",
+    "14 zero-field limits failed validation",
+    "36 transported field pairs failed validation",
+    "42 transported field pairs failed validation"
+  ],
+  "zero_frame_tasks": 13
+}

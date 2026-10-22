@@ -1,0 +1,79 @@
+{
+  "inputs": {
+    "stage1b_runs": "../B2_polar_qgeom_package_v1p3/B2_stage1b_runs",
+    "stage2b_runs": "B2_stage2_combined_runs/stage2b_runs"
+  },
+  "stage2c": {
+    "geometries_Angstrom": [
+      1.925,
+      1.93,
+      1.935,
+      1.94,
+      1.9425,
+      1.9441854605348607,
+      1.945,
+      1.9475,
+      1.95,
+      1.955,
+      1.96,
+      1.965,
+      1.975
+    ],
+    "axes": ["x", "y", "z"],
+    "field_magnitudes_au": {
+      "x": [1e-5, 2.5e-5, 5e-5],
+      "y": [1e-5, 2.5e-5, 5e-5],
+      "z": [1e-4, 2.5e-4, 5e-4]
+    },
+    "weights": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "zero_roots": [
+      {"name": "X_B1g", "wfnsym": "B1g"},
+      {"name": "A_B2u", "wfnsym": "B2u"},
+      {"name": "A_B3u", "wfnsym": "B3u"}
+    ],
+    "casscf": {
+      "conv_tol": 1e-11,
+      "conv_tol_grad": 5e-7,
+      "max_cycle_macro": 300,
+      "max_cycle_micro": 12,
+      "extended_max_cycle_macro": 600,
+      "ah_level_shift": 1e-8,
+      "canonicalization": false,
+      "internal_rotation": true,
+      "ci_conv_tol": 1e-12,
+      "ci_max_cycle": 300,
+      "spin_penalty_shift": 0.2
+    },
+    "scf": {
+      "conv_tol": 1e-12,
+      "conv_tol_grad": 1e-8,
+      "max_cycle": 300,
+      "level_shift": 0.0,
+      "damp": 0.0
+    },
+    "validation": {
+      "target_s2": 2.0,
+      "max_abs_s2_error": 1e-6,
+      "min_zero_field_transport_singular_value": 0.90,
+      "max_plus_minus_energy_difference_Eh": 2e-8,
+      "max_mu_relative_difference_from_stage2b": 0.10,
+      "max_forbidden_z_to_allowed_ratio": 1e-3,
+      "max_xy_response_relative_difference": 0.03,
+      "max_limit_window_relative_change": 0.15,
+      "max_alpha_closure_relative_error": 0.15,
+      "max_metric_closure_relative_error": 0.20,
+      "crossing_gap_threshold_Eh": 1e-8
+    }
+  },
+  "execution": {
+    "work_dir": "B2_stage2_combined_runs/stage2c_runs",
+    "scratch_dir": "B2_stage2c_addon_scratch",
+    "memory_mb_per_worker": 24000,
+    "threads_per_worker": 8,
+    "max_parallel_workers": 4
+  }
+}

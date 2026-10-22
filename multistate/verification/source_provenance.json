@@ -1,0 +1,9 @@
+{
+  "source_archive": "JCP_submission_revised.zip",
+  "source_archive_sha256": "cb883797eabff2e6e23f650af8f1dc5d716056d2dc051d95db930093468f6cc3",
+  "evidence_file_count": 840,
+  "evidence_bytes": 5405647,
+  "evidence_byte_comparison": "all identical",
+  "revision_date": "2026-10-22",
+  "current_analysis_entry_point": "scripts/reproduce.py"
+}

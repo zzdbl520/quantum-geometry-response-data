@@ -1,0 +1,28 @@
+{
+  "analysis_version": "3.2-baseline-aware-direct-mu-hybrid",
+  "axis_response_rows": 18,
+  "explicit_cusp_rows": 0,
+  "field_states_reused": 108,
+  "finite_response_rows": 18,
+  "geometry_response_rows": 6,
+  "max_alpha_background_fit_relative_rms": 0.0119932153806084,
+  "max_alpha_background_window_relative_change": 0.13683052030449025,
+  "max_metric_background_fit_relative_rms": 0.002904062397830847,
+  "max_metric_background_window_relative_change": 0.004398078035298603,
+  "max_neighbor_renormalization_relative_change": 0.00345127996498255,
+  "max_orbital_response_renormalization_ratio": 1.2799509573845216,
+  "max_xy_hybrid_relative_difference": 1.8203856474374992e-06,
+  "method": "Stage1B state-specific diabatic gaps + Stage2B direct common-orbital CI transition moments + Stage2C polar-transport diagonal backgrounds",
+  "min_orbital_response_renormalization_ratio": 1.2679134614407586,
+  "numerical_pair_failures_after_role_separation": 0,
+  "outputs": {
+    "axis_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/hybrid_axis_response.csv",
+    "geometry_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/B2_final_near_crossing_response.csv",
+    "pair_audit": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/hybrid_pair_audit.csv"
+  },
+  "paired_field_rows": 54,
+  "scientific_note": "The smooth 1.27-fold transported/direct coupling ratio is retained as a separately reported orbital-response renormalization. It is not used as the physical zero-field transition moment. The exact crossing remains a |F| cusp.",
+  "source_stage2c_protocol_version": "3.0-polar-transport-SA3",
+  "status": "hybrid_response_pass",
+  "warnings": []
+}

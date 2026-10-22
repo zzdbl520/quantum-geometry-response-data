@@ -1,0 +1,24 @@
+{
+  "status": "REVIEW",
+  "method": "rank-three polar-transport signed-field response",
+  "curvature_fit": "H_even(F)=H_C1(0)-A*F^2/2+B*F^4 with a free common-frame intercept",
+  "pair_count": 452,
+  "limit_count": 113,
+  "global_geometry_count": 54,
+  "gates": {
+    "zero_target_subspace_sv_min": 0.98,
+    "plus_minus_target_subspace_sv_min": 0.95,
+    "active_subspace_sv_min": 0.995,
+    "retained_subspace_sv_min": 0.995,
+    "energy_parity_abs_Eh_max": 5e-08,
+    "ensemble_rdm_fro_max": 0.05,
+    "ensemble_noon_abs_max": 0.1,
+    "spin_square_abs_max": 1e-06,
+    "fit_relative_spread_max": 0.05,
+    "xy_relative_error_max": 0.02,
+    "common_frame_zero_offset_abs_Eh_max": 5e-08
+  },
+  "crossing_interpretation": "Pdeg mu Pdeg is zero: test finite rank-three quadratic response and projector geometry; do not infer a linear Stark cusp from degeneracy alone.",
+  "output_directory": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/analysis",
+  "primary_table": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/analysis/global_response_observables.csv"
+}

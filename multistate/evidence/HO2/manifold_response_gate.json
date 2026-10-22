@@ -1,0 +1,496 @@
+{
+  "candidate_state_count": 4,
+  "classification_counts": {
+    "LOW_GAP_MANIFOLD_REGION": 3,
+    "SMOOTH_MANIFOLD_REGION": 11
+  },
+  "extrema": [
+    {
+      "conservative_peak_margin_au": 4.6795320634959445,
+      "external_ground_alpha_median_au": 19.449482367564187,
+      "external_ground_is_local_maximum": false,
+      "internal_gap_zero_Eh": 0.0067882218289128105,
+      "internal_manifold_ground_alpha_median_au": 8.307080528882384,
+      "internal_response_fraction": 0.29932786845169285,
+      "lower_envelope_au": 27.649230767386864,
+      "mechanism_class": "internal-manifold-generated",
+      "median_au": 27.752446078113927,
+      "neighbor_upper_envelope_au": 22.96969870389092,
+      "observable": "reconstructed-ground",
+      "s_cart_A": -0.31983369816240026,
+      "source_index": 5,
+      "status": "ROBUST_MAXIMUM",
+      "upper_envelope_au": 27.797117195547276
+    },
+    {
+      "conservative_peak_margin_au": 0.21165369577206405,
+      "external_ground_alpha_median_au": 21.543773856238758,
+      "external_ground_is_local_maximum": false,
+      "internal_gap_zero_Eh": 0.09030152948224668,
+      "internal_manifold_ground_alpha_median_au": 3.3200890669584524,
+      "internal_response_fraction": 0.1335307018548961,
+      "lower_envelope_au": 24.772464988957744,
+      "mechanism_class": "internal-manifold-generated",
+      "median_au": 24.863862923197214,
+      "neighbor_upper_envelope_au": 24.56081129318568,
+      "observable": "reconstructed-ground",
+      "s_cart_A": -0.16533247117197714,
+      "source_index": 9,
+      "status": "ROBUST_MAXIMUM",
+      "upper_envelope_au": 25.268333855179222
+    }
+  ],
+  "extrema_status": "VALIDATED_LOCAL_EXTREMA_WITH_GLOBAL_CONTROL_WARNING",
+  "interpretation": "The covariant response operator, non-Abelian projector metric, and internal dipole operator are transported into the zero-field rank-m gauge. The physical nondegenerate lowest-state response is reconstructed as A_00 plus its retained-manifold mixing term. Invariant raw-field plateau envelopes validate physical extrema separately from the stricter full-matrix extrapolation gate. Local nonoverlap can validate extrema and monotonic orderings even when an unrelated boundary control exceeds the global plateau range tolerance. A lost fourth SA4 root does not fail a continuous rank-2 response manifold.",
+  "local_extrema_validation_gate": true,
+  "manifold_rank": 2,
+  "manifold_response_gate": false,
+  "missing_pairs": [],
+  "missing_task_ids": [],
+  "numerical_failure_counts": {
+    "ALPHA_FIT_RESIDUAL": 12,
+    "ALPHA_FIT_STABILITY": 12
+  },
+  "numerical_failures": [
+    {
+      "alpha_fit_residual": 0.005392748461913177,
+      "alpha_fit_stability": 0.007626887110420422,
+      "dipole_fit_residual": 5.453188984594348e-06,
+      "dipole_fit_stability": 7.712367279033572e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 3
+    },
+    {
+      "alpha_fit_residual": 0.0681762778916088,
+      "alpha_fit_stability": 0.10179080158989706,
+      "dipole_fit_residual": 3.235748746499567e-06,
+      "dipole_fit_stability": 4.57627322658638e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 4
+    },
+    {
+      "alpha_fit_residual": 0.06969891032524214,
+      "alpha_fit_stability": 0.11347707871391363,
+      "dipole_fit_residual": 2.1999409054451746e-06,
+      "dipole_fit_stability": 3.111344995088139e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 5
+    },
+    {
+      "alpha_fit_residual": 0.03133194605441858,
+      "alpha_fit_stability": 0.04431232370553484,
+      "dipole_fit_residual": 2.429645178381179e-05,
+      "dipole_fit_stability": 3.436212466645383e-05,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 6
+    },
+    {
+      "alpha_fit_residual": 0.009775654254080002,
+      "alpha_fit_stability": 0.013825568159341994,
+      "dipole_fit_residual": 5.62007230520134e-06,
+      "dipole_fit_stability": 7.948387974132665e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 7
+    },
+    {
+      "alpha_fit_residual": 0.010320141051059382,
+      "alpha_fit_stability": 0.015527601969564798,
+      "dipole_fit_residual": 5.794867885211552e-06,
+      "dipole_fit_stability": 8.195598866223008e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 8
+    },
+    {
+      "alpha_fit_residual": 0.007706088955198274,
+      "alpha_fit_stability": 0.011424838141478417,
+      "dipole_fit_residual": 6.092428886050882e-06,
+      "dipole_fit_stability": 8.616435139274792e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 9
+    },
+    {
+      "alpha_fit_residual": 0.062168654021581726,
+      "alpha_fit_stability": 0.08792423925909537,
+      "dipole_fit_residual": 1.2241239878030274e-05,
+      "dipole_fit_stability": 1.73126106848831e-05,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 10
+    },
+    {
+      "alpha_fit_residual": 0.048367378060607785,
+      "alpha_fit_stability": 0.06840529182857497,
+      "dipole_fit_residual": 1.8559899397363466e-05,
+      "dipole_fit_stability": 2.6249000577238668e-05,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 11
+    },
+    {
+      "alpha_fit_residual": 0.018199823233342557,
+      "alpha_fit_stability": 0.025739750001441963,
+      "dipole_fit_residual": 2.0117957796132823e-06,
+      "dipole_fit_stability": 2.8453097408226213e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 16
+    },
+    {
+      "alpha_fit_residual": 0.01135319098694562,
+      "alpha_fit_stability": 0.015969203217596064,
+      "dipole_fit_residual": 6.347170343288898e-06,
+      "dipole_fit_stability": 8.976801156827487e-06,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 17
+    },
+    {
+      "alpha_fit_residual": 0.020395821215395033,
+      "alpha_fit_stability": 0.028613266896021394,
+      "dipole_fit_residual": 1.6398612001775495e-05,
+      "dipole_fit_stability": 2.319237807948492e-05,
+      "reasons": [
+        "ALPHA_FIT_RESIDUAL",
+        "ALPHA_FIT_STABILITY"
+      ],
+      "source_index": 18
+    }
+  ],
+  "numerical_gate": false,
+  "observable_mechanism_gate": false,
+  "observable_plateau_failure_counts": {
+    "EXTERNAL_GROUND_ALPHA_RANGE": 1,
+    "RECONSTRUCTED_GROUND_ALPHA_RANGE": 1
+  },
+  "observable_plateau_failures": [
+    {
+      "metric_relative_range": 0.00032962951109773825,
+      "reasons": [
+        "EXTERNAL_GROUND_ALPHA_RANGE",
+        "RECONSTRUCTED_GROUND_ALPHA_RANGE"
+      ],
+      "reconstructed_relative_range": 0.03242598775331735,
+      "source_index": 18,
+      "trace_alpha_relative_range": 0.008816543751821115
+    }
+  ],
+  "observable_plateau_gate": false,
+  "observable_plateau_relative_range_tolerance": 0.03,
+  "operator_extrapolation_gate": false,
+  "operator_extrema": [
+    {
+      "external_ground_alpha_au": 21.99998114267349,
+      "internal_gap_zero_Eh": 0.09030152948224668,
+      "internal_manifold_ground_alpha_au": 3.321323594399239,
+      "internal_response_fraction": NaN,
+      "mechanism_class": "smooth-external-manifold",
+      "observable": "trace-average",
+      "robust_envelope_gate": true,
+      "s_cart_A": -0.16533247117197714,
+      "source_index": 9,
+      "ss_local_minimum_overlap": 0.89726229392525,
+      "value_au": 28.70606640853011
+    },
+    {
+      "external_ground_alpha_au": 27.92065050647983,
+      "internal_gap_zero_Eh": 0.16889539331546644,
+      "internal_manifold_ground_alpha_au": 0.46963582246091246,
+      "internal_response_fraction": NaN,
+      "mechanism_class": "smooth-external-manifold",
+      "observable": "trace-average",
+      "robust_envelope_gate": false,
+      "s_cart_A": 0.16769869705937934,
+      "source_index": 17,
+      "ss_local_minimum_overlap": 0.937873462824748,
+      "value_au": 49.97555055777207
+    },
+    {
+      "external_ground_alpha_au": 21.99998114267349,
+      "internal_gap_zero_Eh": 0.09030152948224668,
+      "internal_manifold_ground_alpha_au": 3.321323594399239,
+      "internal_response_fraction": NaN,
+      "mechanism_class": "smooth-external-manifold",
+      "observable": "principal-maximum",
+      "robust_envelope_gate": true,
+      "s_cart_A": -0.16533247117197714,
+      "source_index": 9,
+      "ss_local_minimum_overlap": 0.89726229392525,
+      "value_au": 38.823359238137684
+    },
+    {
+      "external_ground_alpha_au": 27.92065050647983,
+      "internal_gap_zero_Eh": 0.16889539331546644,
+      "internal_manifold_ground_alpha_au": 0.46963582246091246,
+      "internal_response_fraction": NaN,
+      "mechanism_class": "smooth-external-manifold",
+      "observable": "principal-maximum",
+      "robust_envelope_gate": false,
+      "s_cart_A": 0.16769869705937934,
+      "source_index": 17,
+      "ss_local_minimum_overlap": 0.937873462824748,
+      "value_au": 72.10077334166134
+    },
+    {
+      "external_ground_alpha_au": 19.335174947375187,
+      "internal_gap_zero_Eh": 0.0067882218289128105,
+      "internal_manifold_ground_alpha_au": 8.319470971587846,
+      "internal_response_fraction": 0.3008344780825095,
+      "mechanism_class": "mixed-manifold-response",
+      "observable": "reconstructed-ground",
+      "robust_envelope_gate": true,
+      "s_cart_A": -0.31983369816240026,
+      "source_index": 5,
+      "ss_local_minimum_overlap": 0.14303133306959417,
+      "value_au": 27.654645918963034
+    },
+    {
+      "external_ground_alpha_au": 21.99998114267349,
+      "internal_gap_zero_Eh": 0.09030152948224668,
+      "internal_manifold_ground_alpha_au": 3.321323594399239,
+      "internal_response_fraction": 0.1311671585997113,
+      "mechanism_class": "mixed-manifold-response",
+      "observable": "reconstructed-ground",
+      "robust_envelope_gate": false,
+      "s_cart_A": -0.16533247117197714,
+      "source_index": 9,
+      "ss_local_minimum_overlap": 0.89726229392525,
+      "value_au": 25.32130473707273
+    }
+  ],
+  "package_version": "1.2.1",
+  "plateau_field_magnitudes_au": [
+    0.00025,
+    0.0005,
+    0.00075,
+    0.001
+  ],
+  "reaction_topology_gate": true,
+  "response_relevant_stable_rank_gate": true,
+  "robust_adjacent_orderings": [
+    {
+      "conservative_margin_au": 0.5074424569620568,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        14.953370129964904,
+        14.977739337737809
+      ],
+      "left_source_index": 2,
+      "right_envelope_au": [
+        15.485181794699866,
+        15.532837913203512
+      ],
+      "right_source_index": 3
+    },
+    {
+      "conservative_margin_au": 0.26106923283600914,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        15.485181794699866,
+        15.532837913203512
+      ],
+      "left_source_index": 3,
+      "right_envelope_au": [
+        15.79390714603952,
+        16.186359558318536
+      ],
+      "right_source_index": 4
+    },
+    {
+      "conservative_margin_au": 11.462871209068329,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        15.79390714603952,
+        16.186359558318536
+      ],
+      "left_source_index": 4,
+      "right_envelope_au": [
+        27.649230767386864,
+        27.797117195547276
+      ],
+      "right_source_index": 5
+    },
+    {
+      "conservative_margin_au": 4.6795320634959445,
+      "direction": "DECREASING",
+      "left_envelope_au": [
+        27.649230767386864,
+        27.797117195547276
+      ],
+      "left_source_index": 5,
+      "right_envelope_au": [
+        22.779881722959963,
+        22.96969870389092
+      ],
+      "right_source_index": 6
+    },
+    {
+      "conservative_margin_au": 0.9306327071514637,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        22.779881722959963,
+        22.96969870389092
+      ],
+      "left_source_index": 6,
+      "right_envelope_au": [
+        23.900331411042384,
+        23.94911439822655
+      ],
+      "right_source_index": 7
+    },
+    {
+      "conservative_margin_au": 0.3602095286382223,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        23.900331411042384,
+        23.94911439822655
+      ],
+      "left_source_index": 7,
+      "right_envelope_au": [
+        24.30932392686477,
+        24.524075174532353
+      ],
+      "right_source_index": 8
+    },
+    {
+      "conservative_margin_au": 0.24838981442539065,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        24.30932392686477,
+        24.524075174532353
+      ],
+      "left_source_index": 8,
+      "right_envelope_au": [
+        24.772464988957744,
+        25.268333855179222
+      ],
+      "right_source_index": 9
+    },
+    {
+      "conservative_margin_au": 0.21165369577206405,
+      "direction": "DECREASING",
+      "left_envelope_au": [
+        24.772464988957744,
+        25.268333855179222
+      ],
+      "left_source_index": 9,
+      "right_envelope_au": [
+        24.140400218779728,
+        24.56081129318568
+      ],
+      "right_source_index": 10
+    },
+    {
+      "conservative_margin_au": -0.31096871044640295,
+      "direction": "OVERLAPPING",
+      "left_envelope_au": [
+        24.140400218779728,
+        24.56081129318568
+      ],
+      "left_source_index": 10,
+      "right_envelope_au": [
+        24.249842582739277,
+        24.471097255458435
+      ],
+      "right_source_index": 11
+    },
+    {
+      "conservative_margin_au": -0.38508955901762576,
+      "direction": "OVERLAPPING",
+      "left_envelope_au": [
+        27.386913531039777,
+        27.773283687320145
+      ],
+      "left_source_index": 15,
+      "right_envelope_au": [
+        27.38819412830252,
+        27.81271320619136
+      ],
+      "right_source_index": 16
+    },
+    {
+      "conservative_margin_au": 0.5710344875521436,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        27.38819412830252,
+        27.81271320619136
+      ],
+      "left_source_index": 16,
+      "right_envelope_au": [
+        28.383747693743505,
+        28.45963377625769
+      ],
+      "right_source_index": 17
+    },
+    {
+      "conservative_margin_au": 2.0022981633750696,
+      "direction": "INCREASING",
+      "left_envelope_au": [
+        28.383747693743505,
+        28.45963377625769
+      ],
+      "left_source_index": 17,
+      "right_envelope_au": [
+        30.46193193963276,
+        31.480360377433193
+      ],
+      "right_source_index": 18
+    }
+  ],
+  "selected_source_indices": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    15,
+    16,
+    17,
+    18
+  ],
+  "target_extremum_status": {
+    "10": "ROBUST_NOT_MAXIMUM",
+    "16": "ROBUST_NOT_MAXIMUM",
+    "17": "ROBUST_NOT_MAXIMUM",
+    "5": "ROBUST_MAXIMUM",
+    "8": "ROBUST_NOT_MAXIMUM",
+    "9": "ROBUST_MAXIMUM"
+  },
+  "validated_extremum_sources": [
+    5,
+    9
+  ]
+}

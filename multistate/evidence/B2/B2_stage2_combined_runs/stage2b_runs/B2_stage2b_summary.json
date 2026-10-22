@@ -1,0 +1,29 @@
+{
+  "direct_coupling_rows": 13,
+  "effective_model_rows": 338,
+  "ensembles": [
+    "equal_roots",
+    "equal_terms"
+  ],
+  "geometries": 13,
+  "max_allowed_xy_relative_difference": 8.95640246635151e-15,
+  "max_ensemble_mu_relative_difference": 0.04967248510034582,
+  "max_forbidden_to_allowed_ratio": 0.0,
+  "max_neighbor_mu_relative_change": 0.011389098335295444,
+  "merge_sources": {
+    "addon": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2b_addon_runs",
+    "base": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p7/B2_stage2b_runs"
+  },
+  "method": "common-orbital SA3-CASSCF(6,8)/aug-cc-pVTZ direct CI transition density",
+  "outputs": {
+    "all_ensembles": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2b_runs/sa3_all_ensembles.csv",
+    "direct_couplings": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2b_runs/direct_transition_couplings.csv",
+    "effective_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2b_runs/effective_two_level_response.csv"
+  },
+  "protocol_version": "2.0-direct-SA3",
+  "scientific_note": "The transition dipole is a direct common-orbital matrix element, not a fit parameter. At the exact X/A crossing the lower adiabatic energy has a |F| cusp; finite polarizability and finite quantum metric are not reported there.",
+  "stage1b_crossing_R_Angstrom": 1.9441854605348607,
+  "status": "two_level_protocol_pass",
+  "tasks": 26,
+  "warnings": []
+}

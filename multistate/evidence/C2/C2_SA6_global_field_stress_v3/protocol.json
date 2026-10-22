@@ -1,0 +1,170 @@
+{
+  "status": "READY",
+  "method": "equal-weight SA6-CASSCF(8,8)/aug-cc-pVTZ signed-field rank-three transport with direction-adapted C2v root blocks",
+  "field_state_policy": "fixed residual-symmetry root counts plus CI-subspace root homing to immutable zero-field anchors; never the six lowest C1 roots",
+  "state_blocks_by_axis": {
+    "z": [
+      {
+        "irrep": "A1",
+        "zero_root_indices": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "irrep": "A2",
+        "zero_root_indices": [
+          3
+        ]
+      },
+      {
+        "irrep": "B2",
+        "zero_root_indices": [
+          4
+        ]
+      },
+      {
+        "irrep": "B1",
+        "zero_root_indices": [
+          5
+        ]
+      }
+    ],
+    "x": [
+      {
+        "irrep": "A1",
+        "zero_root_indices": [
+          0,
+          1,
+          2,
+          5
+        ]
+      },
+      {
+        "irrep": "B2",
+        "zero_root_indices": [
+          3,
+          4
+        ]
+      }
+    ],
+    "y": [
+      {
+        "irrep": "A1",
+        "zero_root_indices": [
+          0,
+          1,
+          2,
+          4
+        ]
+      },
+      {
+        "irrep": "B2",
+        "zero_root_indices": [
+          3,
+          5
+        ]
+      }
+    ]
+  },
+  "target_manifold": [
+    "X_1Sigma_g+",
+    "Delta_g_x2-y2",
+    "Delta_g_xy"
+  ],
+  "zero_transport_summary": {
+    "status": "PASS",
+    "method": "seeded bidirectional global rank-six SA6-CASSCF geometry transport",
+    "number_of_points": 119,
+    "R_min_angstrom": 1.0,
+    "R_max_angstrom": 3.2,
+    "requested_R_min_angstrom": 1.0,
+    "requested_R_max_angstrom": 3.2,
+    "anchor_R_angstrom": 1.7,
+    "crossing_brackets": [
+      {
+        "R_low_angstrom": 1.652734375,
+        "R_high_angstrom": 1.6528125,
+        "gap_low_Eh": -6.516238499898463e-07,
+        "gap_high_Eh": 5.769687234646881e-06,
+        "linear_crossing_estimate_angstrom": 1.6527423029936152,
+        "width_angstrom": 7.812499999992895e-05
+      },
+      {
+        "R_low_angstrom": 3.0389648438,
+        "R_high_angstrom": 3.0390625,
+        "gap_low_Eh": 1.0184990628658852e-08,
+        "gap_high_Eh": -5.028844896060036e-08,
+        "linear_crossing_estimate_angstrom": 3.0389812911442986,
+        "width_angstrom": 9.765619999990705e-05
+      }
+    ],
+    "number_of_X_Delta_crossing_brackets": 2,
+    "minimum_active_subspace_sv": 0.999316904795259,
+    "minimum_retained_subspace_sv": 0.9969356168580755,
+    "minimum_state_projector_sv": 0.9832796115290547,
+    "minimum_matched_abs_state_overlap": 0.9769684417725875,
+    "maximum_adjacent_polar_unitarity_error": 1.5543122344752192e-15,
+    "maximum_cumulative_polar_unitarity_error": 1.8207657603852567e-14,
+    "maximum_abs_Pdeg_mu_Pdeg_au": 2.487507342375331e-14,
+    "gate": {
+      "minimum_active_sv_ge_0p995": true,
+      "minimum_retained_sv_ge_0p995": true,
+      "minimum_state_projector_sv_ge_0p98": true,
+      "minimum_matched_overlap_ge_0p90": true,
+      "adjacent_polar_unitarity_error_le_1e-10": true,
+      "cumulative_polar_unitarity_error_le_1e-9": true,
+      "all_points_converged": true,
+      "all_states_singlet_abs_S2_le_1e-6": true,
+      "Delta_splits_le_1e-7_Eh": true,
+      "Pi_splits_le_1e-7_Eh": true
+    },
+    "coverage_gate": {
+      "requested_R_min_covered": true,
+      "requested_R_max_covered": true
+    },
+    "next_step": "If PASS, prepare the global signed-field ladder at plot_use points. If REVIEW, inspect the first failing point or transport edge before any response calculation."
+  },
+  "r_values_angstrom": [
+    1.0,
+    2.7,
+    3.0390625
+  ],
+  "xy_audit_r_values_angstrom": [
+    1.2,
+    1.65,
+    1.75,
+    2.2,
+    3.0
+  ],
+  "field_magnitudes_au": [
+    5e-05,
+    0.0001,
+    0.00025,
+    0.0005
+  ],
+  "task_count": 48,
+  "gates": {
+    "zero_target_subspace_sv_min": 0.98,
+    "plus_minus_target_subspace_sv_min": 0.95,
+    "active_subspace_sv_min": 0.995,
+    "retained_subspace_sv_min": 0.995,
+    "energy_parity_abs_Eh_max": 5e-08,
+    "ensemble_noon_abs_max": 0.1,
+    "spin_square_abs_max": 1e-06,
+    "fit_relative_spread_max": 0.05,
+    "xy_relative_error_max": 0.02,
+    "common_frame_zero_offset_abs_Eh_max": 5e-08
+  },
+  "zero_model_max_abs_P_mu_P_au": 1.90746420740665e-14,
+  "field_convention": "H(F)=H0+F.r_electron",
+  "downstream_observables": [
+    "alpha_perpendicular",
+    "alpha_parallel",
+    "alpha_isotropic",
+    "Tr_gFF_target",
+    "Tr_A_target",
+    "Delta_geom_target"
+  ]
+}

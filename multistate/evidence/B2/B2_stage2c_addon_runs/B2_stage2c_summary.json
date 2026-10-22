@@ -1,0 +1,28 @@
+{
+  "field_state_tasks": 108,
+  "max_abs_s2_error": 5.426770144367765e-13,
+  "max_accepted_stationary_plateau_gradient": 0.0,
+  "max_alpha_closure_relative_error": 0.00017459365277916393,
+  "max_metric_closure_relative_error": 0.0005193485752111077,
+  "max_mu_limit_relative_difference_from_stage2b": 0.24557629862261687,
+  "max_xy_response_relative_difference": 2.4981904051051463e-06,
+  "method": "equal-root SA3-CASSCF(6,8)/aug-cc-pVTZ polar-transport finite field",
+  "min_transport_singular_value": 0.9999732791672128,
+  "outputs": {
+    "field_states": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/field_states.csv",
+    "paired_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/transported_field_pairs.csv",
+    "response_limits": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/transported_response_limits.csv"
+  },
+  "paired_field_rows": 54,
+  "protocol_version": "3.0-polar-transport-SA3",
+  "response_limit_rows": 18,
+  "scientific_note": "The finite-field Hamiltonian is transported as a complete SA3 frame. Root labels are never assigned in C1. At Rc the transverse response is reported as a |F| cusp, not as a finite polarizability or finite metric.",
+  "stage1b_crossing_R_Angstrom": 1.9441854605348607,
+  "status": "needs_review",
+  "targeted_stationary_plateau_rows": 0,
+  "warnings": [
+    "36 transported field pairs failed validation",
+    "12 zero-field limits failed validation"
+  ],
+  "zero_frame_tasks": 6
+}

@@ -1,0 +1,49 @@
+task_id,status,R_angstrom,axis,field_magnitude_au,field_sign,output_h5,detail
+0,PASS,1.0,x,5e-05,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_m5.0e-05.h5,
+1,PASS,1.0,x,5e-05,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_p5.0e-05.h5,
+2,PASS,1.0,x,0.0001,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_m1.0e-04.h5,
+3,PASS,1.0,x,0.0001,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_p1.0e-04.h5,
+4,PASS,1.0,x,0.00025,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_m2.5e-04.h5,
+5,PASS,1.0,x,0.00025,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_p2.5e-04.h5,
+6,PASS,1.0,x,0.0005,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_m5.0e-04.h5,
+7,PASS,1.0,x,0.0005,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/x/F_p5.0e-04.h5,
+8,EXCLUDED,1.0,z,5e-05,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_m5.0e-05.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+9,EXCLUDED,1.0,z,5e-05,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_p5.0e-05.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+10,EXCLUDED,1.0,z,0.0001,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_m1.0e-04.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+11,EXCLUDED,1.0,z,0.0001,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_p1.0e-04.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+12,EXCLUDED,1.0,z,0.00025,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_m2.5e-04.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+13,EXCLUDED,1.0,z,0.00025,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_p2.5e-04.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+14,EXCLUDED,1.0,z,0.0005,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_m5.0e-04.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+15,EXCLUDED,1.0,z,0.0005,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_1/z/F_p5.0e-04.h5,unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings
+16,PASS,2.7,x,5e-05,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_m5.0e-05.h5,
+17,PASS,2.7,x,5e-05,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_p5.0e-05.h5,
+18,PASS,2.7,x,0.0001,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_m1.0e-04.h5,
+19,PASS,2.7,x,0.0001,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_p1.0e-04.h5,
+20,PASS,2.7,x,0.00025,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_m2.5e-04.h5,
+21,PASS,2.7,x,0.00025,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_p2.5e-04.h5,
+22,PASS,2.7,x,0.0005,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_m5.0e-04.h5,
+23,PASS,2.7,x,0.0005,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/x/F_p5.0e-04.h5,
+24,PASS,2.7,z,5e-05,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_m5.0e-05.h5,
+25,PASS,2.7,z,5e-05,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_p5.0e-05.h5,
+26,PASS,2.7,z,0.0001,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_m1.0e-04.h5,
+27,PASS,2.7,z,0.0001,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_p1.0e-04.h5,
+28,PASS,2.7,z,0.00025,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_m2.5e-04.h5,
+29,PASS,2.7,z,0.00025,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_p2.5e-04.h5,
+30,PASS,2.7,z,0.0005,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_m5.0e-04.h5,
+31,PASS,2.7,z,0.0005,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_2p7/z/F_p5.0e-04.h5,
+32,PASS,3.0390625,x,5e-05,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_m5.0e-05.h5,
+33,PASS,3.0390625,x,5e-05,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_p5.0e-05.h5,
+34,PASS,3.0390625,x,0.0001,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_m1.0e-04.h5,
+35,PASS,3.0390625,x,0.0001,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_p1.0e-04.h5,
+36,PASS,3.0390625,x,0.00025,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_m2.5e-04.h5,
+37,PASS,3.0390625,x,0.00025,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_p2.5e-04.h5,
+38,PASS,3.0390625,x,0.0005,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_m5.0e-04.h5,
+39,PASS,3.0390625,x,0.0005,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/x/F_p5.0e-04.h5,
+40,PASS,3.0390625,z,5e-05,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_m5.0e-05.h5,
+41,PASS,3.0390625,z,5e-05,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_p5.0e-05.h5,
+42,PASS,3.0390625,z,0.0001,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_m1.0e-04.h5,
+43,PASS,3.0390625,z,0.0001,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_p1.0e-04.h5,
+44,PASS,3.0390625,z,0.00025,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_m2.5e-04.h5,
+45,PASS,3.0390625,z,0.00025,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_p2.5e-04.h5,
+46,PASS,3.0390625,z,0.0005,-1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_m5.0e-04.h5,
+47,PASS,3.0390625,z,0.0005,1,/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/fields/R_3p0390625/z/F_p5.0e-04.h5,

@@ -1,0 +1,2318 @@
+#INFO: **** input file is /scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/b2_stage2c_transport.py ****
+#!/usr/bin/env python3
+"""Stage 2C: gauge-stable transported-SA3 finite-field response for triplet B2.
+
+Finite-field SA3 eigenvectors are not assigned root by root.  Their complete
+three-state frames are aligned to the zero-field (X, A_x, A_y) frame with the
+unitary polar factor of the nonorthogonal many-electron overlap matrix.  The
+transported Hamiltonian is therefore invariant to finite-field root phases,
+permutations, and unitary rotations inside a degenerate subspace.
+
+Stage 1B supplies the audited state-specific zero-field diabatic diagonals;
+Stage 2B supplies an independent direct transition-dipole control.  Stage 2C
+then obtains diagonal backgrounds, full adiabatic polarizabilities, and
+finite-difference quantum metrics from one common finite-field manifold.  At
+the exact transverse X/A crossing the lower energy has a |F| cusp, so no
+ordinary finite polarizability or finite rank-one metric is reported.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import os
+import traceback
+from copy import deepcopy
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+import numpy as np
+
+from b2_polar_qgeom import (
+    build_molecule,
+    config_digest,
+    load_config,
+    load_state,
+    project_mos,
+    r_tag,
+    read_csv,
+    run_rohf,
+    write_csv,
+    write_json,
+)
+from b2_stage1b_symmetry_audit import build_symmetry_molecule
+from b2_stage2b_sa3_manifold import (
+    ROOT_ORDER,
+    nearest_seed_r,
+    prepare_seed,
+    run_sa3_casscf,
+    stage1b_anchor,
+    state_path,
+)
+
+
+PROTOCOL_VERSION = "3.0-polar-transport-SA3"
+TRANSVERSE_COUPLING = {"x": (0, 1), "y": (0, 2)}
+AXIS_INDEX = {"x": 0, "y": 1, "z": 2}
+TARGETED_FIELD_RESCUES = {
+    (round(1.9300, 10), "z", 1.0e-4, "plus"): {
+        "continuation_field_magnitude_au": 2.5e-4,
+        "stationary_plateau_grad_tol": 1.0e-6,
+    },
+    (round(1.9300, 10), "z", 1.0e-4, "minus"): {
+        "continuation_field_magnitude_au": 2.5e-4,
+        "stationary_plateau_grad_tol": 1.0e-6,
+    },
+}
+
+
+def require_runtime():
+    try:
+        import h5py
+        import pyscf
+        from pyscf import fci, gto, lib, mcscf, scf
+    except Exception as exc:  # pragma: no cover - cluster-only dependency
+        raise RuntimeError(
+            "PySCF and h5py are required. Activate the PySCF/MOKIT environment."
+        ) from exc
+    return h5py, pyscf, fci, gto, lib, mcscf, scf
+
+
+def digest_obj(obj: Any) -> str:
+    raw = json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(raw).hexdigest()[:16]
+
+
+def resolve_stage1b_runs(cfg: Dict[str, Any], cli: Optional[Path]) -> Path:
+    if cli is not None:
+        return cli.resolve()
+    return Path(os.environ.get("B2_STAGE1B_RUNS", cfg["inputs"]["stage1b_runs"])).resolve()
+
+
+def resolve_stage2b_runs(cfg: Dict[str, Any], cli: Optional[Path]) -> Path:
+    if cli is not None:
+        return cli.resolve()
+    return Path(os.environ.get("B2_STAGE2B_RUNS", cfg["inputs"]["stage2b_runs"])).resolve()
+
+
+def resolve_work_dir(cfg: Dict[str, Any]) -> Path:
+    return Path(
+        os.environ.get("B2_STAGE2C_WORK_DIR", cfg["execution"]["work_dir"])
+    ).resolve()
+
+
+def electronic_config(stage1b_cfg: Dict[str, Any], cfg: Dict[str, Any]) -> Dict[str, Any]:
+    result = deepcopy(stage1b_cfg)
+    result["casscf"].update(cfg["stage2c"]["casscf"])
+    result["scf"].update(cfg["stage2c"]["scf"])
+    result["execution"]["memory_mb"] = int(cfg["execution"]["memory_mb_per_worker"])
+    return result
+
+
+def zero_tasks(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [
+        {"task_index": index, "R_Angstrom": float(r_value)}
+        for index, r_value in enumerate(cfg["stage2c"]["geometries_Angstrom"])
+    ]
+
+
+def field_tasks(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    section = cfg["stage2c"]
+    tasks: List[Dict[str, Any]] = []
+    index = 0
+    for r_value in section["geometries_Angstrom"]:
+        for axis in section["axes"]:
+            if axis not in AXIS_INDEX:
+                raise ValueError(f"Unknown field axis {axis}")
+            magnitudes = section["field_magnitudes_au"][axis]
+            if len(magnitudes) < 3 or any(float(value) <= 0 for value in magnitudes):
+                raise ValueError(f"Need at least three positive fields for axis {axis}")
+            for magnitude in magnitudes:
+                for sign_name, sign in (("plus", 1.0), ("minus", -1.0)):
+                    tasks.append(
+                        {
+                            "task_index": index,
+                            "R_Angstrom": float(r_value),
+                            "axis": axis,
+                            "field_magnitude_au": float(magnitude),
+                            "sign": sign_name,
+                            "field_au": sign * float(magnitude),
+                        }
+                    )
+                    index += 1
+    return tasks
+
+
+def zero_checkpoint(work: Path, task: Dict[str, Any]) -> Path:
+    return work / "zero" / r_tag(float(task["R_Angstrom"])) / "sa3_zero.h5"
+
+
+def zero_csv(work: Path, task: Dict[str, Any]) -> Path:
+    return work / "zero" / r_tag(float(task["R_Angstrom"])) / "result.csv"
+
+
+def field_checkpoint(work: Path, task_index: int) -> Path:
+    return work / "field" / f"task_{task_index:03d}" / "sa3_field.h5"
+
+
+def field_csv(work: Path, task_index: int) -> Path:
+    return work / "field" / f"task_{task_index:03d}" / "result.csv"
+
+
+def task_digest(
+    kind: str,
+    task: Dict[str, Any],
+    cfg: Dict[str, Any],
+    stage1b_cfg: Dict[str, Any],
+) -> str:
+    return digest_obj(
+        {
+            "protocol": PROTOCOL_VERSION,
+            "kind": kind,
+            "task": task,
+            "stage2c": cfg["stage2c"],
+            "stage1b_hash": config_digest(stage1b_cfg),
+        }
+    )
+
+
+def _h5_attr_text(value: Any) -> str:
+    return value.decode() if isinstance(value, bytes) else str(value)
+
+
+def load_frame(path: Path, expected_hash: Optional[str] = None) -> Dict[str, Any]:
+    h5py, _, _, _, _, _, _ = require_runtime()
+    with h5py.File(path, "r") as handle:
+        observed = _h5_attr_text(handle.attrs.get("config_hash", ""))
+        if expected_hash is not None and observed != expected_hash:
+            raise RuntimeError(
+                f"Checkpoint config mismatch: {path} ({observed} != {expected_hash})"
+            )
+        raw = _h5_attr_text(handle.attrs.get("row_json", "{}"))
+        result: Dict[str, Any] = {
+            "row": json.loads(raw),
+            "config_hash": observed,
+            "mo": np.asarray(handle["mo_coeff"]),
+            "energies": np.asarray(handle["root_energies_Eh"], dtype=float),
+            "ci": [np.asarray(handle[f"ci/{index}"]) for index in range(3)],
+        }
+        for name in (
+            "overlap_zero_field",
+            "transport_singular_values",
+            "polar_transport",
+            "transported_hamiltonian_Eh",
+        ):
+            if name in handle:
+                result[name] = np.asarray(handle[name])
+        return result
+
+
+def save_frame(
+    path: Path,
+    config_hash: str,
+    row: Dict[str, Any],
+    mo: np.ndarray,
+    energies: np.ndarray,
+    ci_vectors: Sequence[np.ndarray],
+    extra: Optional[Dict[str, np.ndarray]] = None,
+) -> None:
+    h5py, _, _, _, _, _, _ = require_runtime()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with h5py.File(tmp, "w") as handle:
+        handle.attrs["protocol_version"] = PROTOCOL_VERSION
+        handle.attrs["config_hash"] = config_hash
+        handle.attrs["row_json"] = json.dumps(row, sort_keys=True)
+        handle.create_dataset("mo_coeff", data=np.asarray(mo))
+        handle.create_dataset("root_energies_Eh", data=np.asarray(energies))
+        group = handle.create_group("ci")
+        for index, ci in enumerate(ci_vectors):
+            group.create_dataset(str(index), data=np.asarray(ci))
+        for name, value in (extra or {}).items():
+            handle.create_dataset(name, data=np.asarray(value))
+    os.replace(tmp, path)
+
+
+def stage2b_source(stage2b_runs: Path, r_value: float) -> Optional[Path]:
+    table = stage2b_runs / "sa3_all_ensembles.csv"
+    if not table.exists():
+        return None
+    matches = [
+        row
+        for row in read_csv(table)
+        if row.get("ensemble") == "equal_roots"
+        and abs(float(row["R_Angstrom"]) - r_value) < 5e-9
+        and row.get("status") == "PASS"
+    ]
+    if len(matches) != 1:
+        return None
+    index = int(matches[0]["task_index"])
+    path = stage2b_runs / "tasks" / f"task_{index:03d}" / "sa3_state.h5"
+    return path if path.exists() else None
+
+
+def stage1b_rows(stage1b_runs: Path) -> List[Dict[str, str]]:
+    path = stage1b_runs / "B2_symmetry_branch_map.csv"
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return read_csv(path)
+
+
+def crossing_r(stage1b_runs: Path) -> float:
+    summary = json.loads((stage1b_runs / "B2_stage1b_summary.json").read_text())
+    return float(summary["crossings"][0]["R_Angstrom"])
+
+
+def run_zero_worker(
+    cfg: Dict[str, Any],
+    stage1b_cfg: Dict[str, Any],
+    stage1b_runs: Path,
+    stage2b_runs: Path,
+    task_index: int,
+) -> None:
+    tasks = zero_tasks(cfg)
+    if task_index < 0 or task_index >= len(tasks):
+        raise IndexError(task_index)
+    task = tasks[task_index]
+    work = resolve_work_dir(cfg)
+    digest = task_digest("zero", task, cfg, stage1b_cfg)
+    target = zero_checkpoint(work, task)
+    if target.exists():
+        frame = load_frame(target, digest)
+        write_csv(zero_csv(work, task), [frame["row"]])
+        print(f"RESUMED {target}", flush=True)
+        return
+
+    r_value = float(task["R_Angstrom"])
+    source = stage2b_source(stage2b_runs, r_value)
+    if source is not None:
+        frame = load_frame(source)
+        row = {
+            "task_index": task_index,
+            "R_Angstrom": r_value,
+            "source": "stage2b_equal_roots_checkpoint",
+            "source_checkpoint": str(source),
+            "zero_X_energy_Eh": float(frame["energies"][0]),
+            "zero_A_B2u_energy_Eh": float(frame["energies"][1]),
+            "zero_A_B3u_energy_Eh": float(frame["energies"][2]),
+            "status": "PASS",
+            "reasons": "",
+        }
+        save_frame(target, digest, row, frame["mo"], frame["energies"], frame["ci"])
+        write_csv(zero_csv(work, task), [row])
+        print(f"REUSED {source}", flush=True)
+        return
+
+    # Full-grid fallback: calculate a new equal-root D2h SA3 zero frame.
+    rows = stage1b_rows(stage1b_runs)
+    seed_r = nearest_seed_r(r_value, rows)
+    e_cfg = electronic_config(stage1b_cfg, cfg)
+    mol, dm0, mo0 = prepare_seed(
+        r_value, seed_r, stage1b_runs, stage1b_cfg, e_cfg
+    )
+    mf = run_rohf(mol, e_cfg, dm0=dm0)
+    compat = {
+        "casscf": cfg["stage2c"]["casscf"],
+        "roots": cfg["stage2c"]["zero_roots"],
+    }
+    sa_task = {"weights": cfg["stage2c"]["weights"]}
+    mc, solvers, energies, ci_vectors, diagnostics = run_sa3_casscf(
+        mf, mo0, sa_task, {**e_cfg, "stage2b": compat}
+    )
+    target_s2 = float(cfg["stage2c"]["validation"]["target_s2"])
+    s2_values = [
+        float(solver.spin_square(ci, int(mc.ncas), tuple(mc.nelecas))[0])
+        for solver, ci in zip(solvers, ci_vectors)
+    ]
+    max_s2 = max(abs(value - target_s2) for value in s2_values)
+    row = {
+        "task_index": task_index,
+        "R_Angstrom": r_value,
+        "source": "new_equal_root_D2h_SA3",
+        "source_checkpoint": "",
+        "seed_R_Angstrom": seed_r,
+        "zero_X_energy_Eh": float(energies[0]),
+        "zero_A_B2u_energy_Eh": float(energies[1]),
+        "zero_A_B3u_energy_Eh": float(energies[2]),
+        "max_abs_s2_error": max_s2,
+        "convergence_stage": str(getattr(mc, "_b2_convergence_stage", "unknown")),
+        "last_orbital_gradient": diagnostics.get("norm_gorb", ""),
+        "status": "PASS" if max_s2 <= float(cfg["stage2c"]["validation"]["max_abs_s2_error"]) else "AMBIGUOUS",
+        "reasons": "" if max_s2 <= float(cfg["stage2c"]["validation"]["max_abs_s2_error"]) else "spin",
+    }
+    save_frame(target, digest, row, mc.mo_coeff, energies, ci_vectors)
+    write_csv(zero_csv(work, task), [row])
+    if row["status"] != "PASS":
+        raise RuntimeError(f"Zero task {task_index:03d} failed: {row['reasons']}")
+
+
+def embed_ci(
+    ci: np.ndarray, ncore: int, ncas: int, nelecas: Tuple[int, int]
+) -> Tuple[np.ndarray, int, Tuple[int, int]]:
+    _, _, fci, _, _, _, _ = require_runtime()
+    norb = ncore + ncas
+    na, nb = (int(nelecas[0]), int(nelecas[1]))
+    full_nelec = (na + ncore, nb + ncore)
+    active_a = fci.cistring.make_strings(range(ncas), na)
+    active_b = fci.cistring.make_strings(range(ncas), nb)
+    full_a = fci.cistring.make_strings(range(norb), full_nelec[0])
+    full_b = fci.cistring.make_strings(range(norb), full_nelec[1])
+    index_a = {int(value): index for index, value in enumerate(full_a)}
+    index_b = {int(value): index for index, value in enumerate(full_b)}
+    core_mask = (1 << ncore) - 1
+    ia = [index_a[core_mask | (int(value) << ncore)] for value in active_a]
+    ib = [index_b[core_mask | (int(value) << ncore)] for value in active_b]
+    result = np.zeros((len(full_a), len(full_b)), dtype=np.asarray(ci).dtype)
+    active = np.asarray(ci).reshape(len(active_a), len(active_b))
+    result[np.ix_(ia, ib)] = active
+    return result, norb, full_nelec
+
+
+def frame_overlap(
+    mol_left,
+    mo_left: np.ndarray,
+    ci_left: Sequence[np.ndarray],
+    mol_right,
+    mo_right: np.ndarray,
+    ci_right: Sequence[np.ndarray],
+    ncore: int,
+    ncas: int,
+    nelecas: Tuple[int, int],
+) -> np.ndarray:
+    _, _, fci, gto, _, _, _ = require_runtime()
+    sao = gto.intor_cross("int1e_ovlp", mol_left, mol_right)
+    norb = ncore + ncas
+    smo = (
+        np.asarray(mo_left)[:, :norb].conj().T
+        @ sao
+        @ np.asarray(mo_right)[:, :norb]
+    )
+    embedded_left = [embed_ci(ci, ncore, ncas, nelecas)[0] for ci in ci_left]
+    embedded_right = [embed_ci(ci, ncore, ncas, nelecas)[0] for ci in ci_right]
+    full_nelec = (int(nelecas[0]) + ncore, int(nelecas[1]) + ncore)
+    result = np.empty((3, 3), dtype=complex)
+    for bra in range(3):
+        for ket in range(3):
+            result[bra, ket] = fci.addons.overlap(
+                embedded_left[bra],
+                embedded_right[ket],
+                norb,
+                full_nelec,
+                s=smo,
+            )
+    return result
+
+
+def polar_factor(overlap: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    u, singular, vh = np.linalg.svd(np.asarray(overlap), full_matrices=False)
+    return u @ vh, singular
+
+
+def hermitize(matrix: np.ndarray) -> np.ndarray:
+    value = np.asarray(matrix)
+    return 0.5 * (value + value.conj().T)
+
+
+def transported_hamiltonian(
+    overlap_zero_field: np.ndarray, root_energies: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    transport, singular = polar_factor(overlap_zero_field)
+    hamiltonian = transport @ np.diag(root_energies) @ transport.conj().T
+    return hermitize(hamiltonian), transport, singular
+
+
+def configure_c1_solver(mol, cfg: Dict[str, Any]):
+    _, _, fci, _, _, _, _ = require_runtime()
+    opts = cfg["stage2c"]["casscf"]
+    solver = fci.direct_spin1.FCI(mol)
+    solver.nroots = 3
+    solver.spin = int(mol.spin)
+    solver.conv_tol = float(opts["ci_conv_tol"])
+    solver.max_cycle = int(opts["ci_max_cycle"])
+    shift = float(opts.get("spin_penalty_shift", 0.0))
+    if shift > 0:
+        fixer = getattr(fci.addons, "fix_spin_", None) or fci.addons.fix_spin
+        solver = fixer(
+            solver,
+            shift=shift,
+            ss=float(cfg["stage2c"]["validation"]["target_s2"]),
+        )
+        solver.nroots = 3
+        solver.spin = int(mol.spin)
+        solver.conv_tol = float(opts["ci_conv_tol"])
+        solver.max_cycle = int(opts["ci_max_cycle"])
+    return solver
+
+
+def _state_energies(mc) -> np.ndarray:
+    values = getattr(mc, "e_states", None)
+    if values is None:
+        values = getattr(mc.fcisolver, "e_states", None)
+    if callable(values):
+        values = values()
+    result = np.asarray(values, dtype=float).reshape(-1)
+    if result.size != 3:
+        raise RuntimeError(f"Expected three SA3 energies, got {result}")
+    return result
+
+
+def _ci_vectors(mc) -> List[np.ndarray]:
+    if not isinstance(mc.ci, (list, tuple)) or len(mc.ci) != 3:
+        raise RuntimeError("C1 equal-root SA3 did not return three CI vectors")
+    return [np.asarray(value) for value in mc.ci]
+
+
+def run_c1_sa3(
+    mf,
+    mo0: np.ndarray,
+    ci0: Sequence[np.ndarray],
+    cfg: Dict[str, Any],
+    e_cfg: Dict[str, Any],
+    stationary_plateau_grad_tol: Optional[float] = None,
+):
+    _, _, _, _, _, mcscf, _ = require_runtime()
+    active = e_cfg["active_space"]
+    opts = cfg["stage2c"]["casscf"]
+    solver = configure_c1_solver(mf.mol, cfg)
+    mc = mcscf.CASSCF(
+        mf,
+        int(active["ncas"]),
+        tuple(int(value) for value in active["nelecas"]),
+    )
+    mc.ncore = int(active["avas_ncore"])
+    mc.fcisolver = solver
+    mcscf.state_average_(mc, [float(value) for value in cfg["stage2c"]["weights"]])
+    mc.conv_tol = float(opts["conv_tol"])
+    mc.conv_tol_grad = float(opts["conv_tol_grad"])
+    mc.max_cycle_macro = int(opts["max_cycle_macro"])
+    mc.max_cycle_micro = int(opts["max_cycle_micro"])
+    mc.ah_level_shift = float(opts.get("ah_level_shift", 1e-8))
+    mc.canonicalization = bool(opts.get("canonicalization", False))
+    mc.internal_rotation = bool(opts.get("internal_rotation", True))
+    diagnostics: Dict[str, float] = {}
+
+    def capture(envs: Dict[str, Any]) -> None:
+        for key in ("imacro", "de", "norm_gorb", "norm_gci", "norm_ddm"):
+            if envs.get(key) is not None:
+                try:
+                    diagnostics[key] = float(envs[key])
+                except (TypeError, ValueError):
+                    pass
+
+    mc.kernel(mo0, ci0=list(ci0), callback=capture)
+    stage = "primary"
+    if not mc.converged:
+        print(
+            f"      C1_SA3_PRIMARY_NOT_CONVERGED Eavg={float(mc.e_tot):.14f} "
+            f"diagnostics={diagnostics}",
+            flush=True,
+        )
+        mc.max_cycle_macro = int(opts["extended_max_cycle_macro"])
+        mc.max_cycle_micro = max(12, int(opts["max_cycle_micro"]))
+        mc.max_stepsize = min(float(getattr(mc, "max_stepsize", 0.02)), 0.01)
+        mc.ah_start_tol = min(float(getattr(mc, "ah_start_tol", 2.5)), 1e-6)
+        mc.ah_conv_tol = min(float(getattr(mc, "ah_conv_tol", 1e-8)), 1e-10)
+        diagnostics.clear()
+        mc.kernel(mc.mo_coeff, ci0=mc.ci, callback=capture)
+        stage = "extended"
+    if not mc.converged and stationary_plateau_grad_tol is not None:
+        grad = abs(float(diagnostics.get("norm_gorb", math.inf)))
+        de = abs(float(diagnostics.get("de", math.inf)))
+        ddm = abs(float(diagnostics.get("norm_ddm", math.inf)))
+        plateau_ok = (
+            grad <= float(stationary_plateau_grad_tol)
+            and de <= float(opts["conv_tol"])
+            and ddm <= 1.0e-10
+        )
+        if plateau_ok:
+            stage = "extended_stationary_plateau"
+            diagnostics["strict_grad_tol"] = float(opts["conv_tol_grad"])
+            diagnostics["accepted_plateau_grad_tol"] = float(
+                stationary_plateau_grad_tol
+            )
+            mc.converged = True
+            print(
+                "      C1_SA3_TARGETED_STATIONARY_PLATEAU_ACCEPTED "
+                f"Eavg={float(mc.e_tot):.14f} diagnostics={diagnostics}",
+                flush=True,
+            )
+    if not mc.converged:
+        raise RuntimeError(
+            "C1 equal-root SA3-CASSCF did not converge after primary and "
+            f"extended stages; Eavg={float(mc.e_tot):.14f} diagnostics={diagnostics}"
+        )
+    mc._b2_convergence_stage = stage
+    return mc, solver, _state_energies(mc), _ci_vectors(mc), diagnostics
+
+
+def field_initial_guess(
+    r_value: float,
+    zero: Dict[str, Any],
+    stage1b_runs: Path,
+    stage1b_cfg: Dict[str, Any],
+    e_cfg: Dict[str, Any],
+):
+    _, _, _, _, _, _, scf = require_runtime()
+    rows = stage1b_rows(stage1b_runs)
+    seed_r = nearest_seed_r(r_value, rows)
+    source = load_state(state_path(stage1b_runs, "X_B1g", seed_r), stage1b_cfg)
+    source_mol = build_symmetry_molecule(seed_r, e_cfg, verbose=0)
+    zero_mol = build_symmetry_molecule(r_value, e_cfg, verbose=0)
+    field_mol = build_molecule(r_value, e_cfg, verbose=4)
+    scf_mo = project_mos(source_mol, source.scf_mo, field_mol)
+    dm0 = scf.ROHF(field_mol).make_rdm1(scf_mo, source.scf_occ)
+    mo0 = project_mos(zero_mol, zero["mo"], field_mol)
+    return zero_mol, field_mol, dm0, mo0, seed_r
+
+
+def run_field_worker(
+    cfg: Dict[str, Any],
+    stage1b_cfg: Dict[str, Any],
+    stage1b_runs: Path,
+    task_index: int,
+    targeted_rescue: bool = False,
+) -> None:
+    tasks = field_tasks(cfg)
+    if task_index < 0 or task_index >= len(tasks):
+        raise IndexError(task_index)
+    task = tasks[task_index]
+    work = resolve_work_dir(cfg)
+    digest = task_digest("field", task, cfg, stage1b_cfg)
+    target = field_checkpoint(work, task_index)
+    if target.exists():
+        frame = load_frame(target, digest)
+        write_csv(field_csv(work, task_index), [frame["row"]])
+        print(f"RESUMED {target}", flush=True)
+        return
+
+    zero_task = min(
+        zero_tasks(cfg),
+        key=lambda value: abs(float(value["R_Angstrom"]) - float(task["R_Angstrom"])),
+    )
+    if abs(float(zero_task["R_Angstrom"]) - float(task["R_Angstrom"])) > 5e-9:
+        raise RuntimeError("No zero frame for field task")
+    zero_hash = task_digest("zero", zero_task, cfg, stage1b_cfg)
+    zero = load_frame(zero_checkpoint(work, zero_task), zero_hash)
+    e_cfg = electronic_config(stage1b_cfg, cfg)
+    zero_mol, field_mol, dm0, mo0, seed_r = field_initial_guess(
+        float(task["R_Angstrom"]), zero, stage1b_runs, stage1b_cfg, e_cfg
+    )
+    ci0 = zero["ci"]
+    casscf_seed_kind = "zero_field_frame"
+    continuation_seed_task_index: Any = ""
+    plateau_grad_tol: Optional[float] = None
+    if targeted_rescue:
+        rescue = targeted_field_rescue(task)
+        if rescue is None:
+            raise RuntimeError(
+                f"Task {task_index:03d} is not an authorized targeted rescue"
+            )
+        continuation_magnitude = float(
+            rescue["continuation_field_magnitude_au"]
+        )
+        candidates = [
+            item
+            for item in tasks
+            if abs(float(item["R_Angstrom"]) - float(task["R_Angstrom"])) < 5e-9
+            and str(item["axis"]) == str(task["axis"])
+            and str(item["sign"]) == str(task["sign"])
+            and abs(
+                float(item["field_magnitude_au"]) - continuation_magnitude
+            ) < 1e-15
+        ]
+        if len(candidates) != 1:
+            raise RuntimeError(
+                f"Expected one continuation seed for task {task_index:03d}, "
+                f"found {len(candidates)}"
+            )
+        continuation_task = candidates[0]
+        continuation_seed_task_index = int(continuation_task["task_index"])
+        continuation_hash = task_digest(
+            "field", continuation_task, cfg, stage1b_cfg
+        )
+        continuation = load_frame(
+            field_checkpoint(work, continuation_seed_task_index),
+            continuation_hash,
+        )
+        mo0 = np.asarray(continuation["mo"])
+        ci0 = continuation["ci"]
+        casscf_seed_kind = "same_sign_larger_field_continuation"
+        plateau_grad_tol = float(rescue["stationary_plateau_grad_tol"])
+        print(
+            f"TARGETED RESCUE task={task_index:03d} continuation_seed="
+            f"{continuation_seed_task_index:03d} strict_grad_tol="
+            f"{float(cfg['stage2c']['casscf']['conv_tol_grad']):.3e} "
+            f"plateau_grad_tol={plateau_grad_tol:.3e}",
+            flush=True,
+        )
+    _, _, _, _, lib, _, _ = require_runtime()
+    scratch_root = Path(
+        os.environ.get("B2_STAGE2C_SCRATCH_DIR", cfg["execution"]["scratch_dir"])
+    ).resolve()
+    scratch = scratch_root / f"field_{task_index:03d}"
+    scratch.mkdir(parents=True, exist_ok=True)
+    lib.param.TMPDIR = str(scratch)
+    print(
+        f"FIELD task={task_index:03d} R={task['R_Angstrom']:.10f} "
+        f"axis={task['axis']} F={task['field_au']:+.3e} seed_R={seed_r:.4f}",
+        flush=True,
+    )
+    mf = run_rohf(
+        field_mol,
+        e_cfg,
+        dm0=dm0,
+        axis=str(task["axis"]),
+        field=float(task["field_au"]),
+    )
+    mc, solver, energies, ci_vectors, diagnostics = run_c1_sa3(
+        mf,
+        mo0,
+        ci0,
+        cfg,
+        e_cfg,
+        stationary_plateau_grad_tol=plateau_grad_tol,
+    )
+    active = e_cfg["active_space"]
+    ncore = int(active["avas_ncore"])
+    ncas = int(active["ncas"])
+    nelecas = tuple(int(value) for value in active["nelecas"])
+    overlap0 = frame_overlap(
+        zero_mol,
+        zero["mo"],
+        zero["ci"],
+        field_mol,
+        mc.mo_coeff,
+        ci_vectors,
+        ncore,
+        ncas,
+        nelecas,
+    )
+    h_transport, transport, singular = transported_hamiltonian(overlap0, energies)
+    s2_values = [
+        float(solver.spin_square(ci, ncas, nelecas)[0]) for ci in ci_vectors
+    ]
+    validation = cfg["stage2c"]["validation"]
+    max_s2 = max(abs(value - float(validation["target_s2"])) for value in s2_values)
+    reasons: List[str] = []
+    if max_s2 > float(validation["max_abs_s2_error"]):
+        reasons.append("spin")
+    if float(np.min(singular)) < float(validation["min_zero_field_transport_singular_value"]):
+        reasons.append("zero_field_subspace_loss")
+    row: Dict[str, Any] = {
+        **task,
+        "protocol_version": PROTOCOL_VERSION,
+        "seed_R_Angstrom": seed_r,
+        "casscf_seed_kind": casscf_seed_kind,
+        "continuation_seed_task_index": continuation_seed_task_index,
+        "strict_orbital_gradient_gate": float(
+            cfg["stage2c"]["casscf"]["conv_tol_grad"]
+        ),
+        "stationary_plateau_gradient_gate": (
+            plateau_grad_tol if plateau_grad_tol is not None else ""
+        ),
+        "stationary_plateau_accepted": (
+            str(getattr(mc, "_b2_convergence_stage", ""))
+            == "extended_stationary_plateau"
+        ),
+        "sa_average_energy_Eh": float(mc.e_tot),
+        "root_0_energy_Eh": float(energies[0]),
+        "root_1_energy_Eh": float(energies[1]),
+        "root_2_energy_Eh": float(energies[2]),
+        "min_zero_field_transport_singular_value": float(np.min(singular)),
+        "max_zero_field_transport_singular_value": float(np.max(singular)),
+        "max_abs_s2_error": max_s2,
+        "convergence_stage": str(getattr(mc, "_b2_convergence_stage", "unknown")),
+        "last_macro": diagnostics.get("imacro", ""),
+        "last_dE_Eh": diagnostics.get("de", ""),
+        "last_orbital_gradient": diagnostics.get("norm_gorb", ""),
+        "status": "PASS" if not reasons else "AMBIGUOUS",
+        "reasons": ";".join(reasons),
+        "checkpoint": str(target),
+    }
+    save_frame(
+        target,
+        digest,
+        row,
+        mc.mo_coeff,
+        energies,
+        ci_vectors,
+        extra={
+            "overlap_zero_field": overlap0,
+            "transport_singular_values": singular,
+            "polar_transport": transport,
+            "transported_hamiltonian_Eh": h_transport,
+        },
+    )
+    write_csv(field_csv(work, task_index), [row])
+    if row["status"] != "PASS":
+        raise RuntimeError(f"Field task {task_index:03d} failed: {row['reasons']}")
+
+
+def _relative_difference(a: float, b: float, floor: float = 1e-14) -> float:
+    return abs(a - b) / max(0.5 * (abs(a) + abs(b)), floor)
+
+
+def independent_direct_couplings(stage2b_runs: Path) -> Dict[float, Dict[str, str]]:
+    path = stage2b_runs / "direct_transition_couplings.csv"
+    if not path.exists():
+        raise FileNotFoundError(path)
+    rows = read_csv(path)
+    result = {
+        round(float(row["R_Angstrom"]), 10): row
+        for row in rows
+        if row.get("status") == "PASS"
+    }
+    return result
+
+
+def field_key(task: Dict[str, Any]) -> Tuple[float, str, float, str]:
+    return (
+        round(float(task["R_Angstrom"]), 10),
+        str(task["axis"]),
+        float(task["field_magnitude_au"]),
+        str(task["sign"]),
+    )
+
+
+def targeted_field_rescue(task: Dict[str, Any]) -> Optional[Dict[str, float]]:
+    key = (
+        round(float(task["R_Angstrom"]), 10),
+        str(task["axis"]),
+        float(task["field_magnitude_au"]),
+        str(task["sign"]),
+    )
+    return TARGETED_FIELD_RESCUES.get(key)
+
+
+def _mean_lowest_eigenspace(
+    hamiltonian: np.ndarray, rank: int
+) -> Tuple[float, np.ndarray, np.ndarray]:
+    eigenvalues, eigenvectors = np.linalg.eigh(hermitize(hamiltonian))
+    return (
+        float(np.mean(eigenvalues[:rank])),
+        eigenvectors[:, :rank],
+        eigenvalues,
+    )
+
+
+def subspace_metric(
+    coefficients_plus: np.ndarray,
+    coefficients_minus: np.ndarray,
+    transport_plus: np.ndarray,
+    transport_minus: np.ndarray,
+    overlap_plus_minus: np.ndarray,
+    field: float,
+) -> Tuple[float, float, np.ndarray]:
+    b_plus = transport_plus.conj().T @ coefficients_plus
+    b_minus = transport_minus.conj().T @ coefficients_minus
+    overlap = b_plus.conj().T @ overlap_plus_minus @ b_minus
+    singular = np.linalg.svd(overlap, compute_uv=False)
+    rank = coefficients_plus.shape[1]
+    loss = max(0.0, float(rank - np.sum(np.minimum(singular * singular, 1.0))))
+    trace_metric = loss / (4.0 * field * field)
+    return trace_metric / rank, trace_metric, singular
+
+
+def response_subspaces(
+    axis: str, gap: float, at_crossing: bool
+) -> Tuple[int, List[int], str]:
+    if axis in TRANSVERSE_COUPLING:
+        bright = TRANSVERSE_COUPLING[axis][1]
+        if at_crossing:
+            return 1, [0, bright], "exact_crossing_abs_F_cusp"
+        if gap < 0.0:
+            return 1, [0], "finite_gap_X_ground"
+        return 1, [bright], "finite_gap_A_bright_ground"
+    if at_crossing:
+        return 3, [0, 1, 2], "exact_crossing_longitudinal_rank3"
+    if gap < 0.0:
+        return 1, [0], "finite_gap_X_ground_longitudinal"
+    return 2, [1, 2], "finite_gap_A_rank2_longitudinal"
+
+
+def _linear_intercept(x: Sequence[float], y: Sequence[float]) -> Tuple[float, float]:
+    xx = np.asarray(x, dtype=float)
+    yy = np.asarray(y, dtype=float)
+    if len(xx) < 2:
+        raise ValueError("At least two points are required for a limit")
+    coeff = np.polyfit(xx, yy, 1)
+    fitted = np.polyval(coeff, xx)
+    scale = max(float(np.max(abs(yy))), abs(float(coeff[1])), 1e-14)
+    rms_relative = float(np.sqrt(np.mean((fitted - yy) ** 2)) / scale)
+    return float(coeff[1]), rms_relative
+
+
+def _window_change(x: Sequence[float], y: Sequence[float], intercept: float) -> float:
+    order = np.argsort(np.asarray(x, dtype=float))
+    if len(order) < 3:
+        return 0.0
+    reduced, _ = _linear_intercept(
+        [x[index] for index in order[:-1]],
+        [y[index] for index in order[:-1]],
+    )
+    return _relative_difference(intercept, reduced)
+
+
+def _real(value: complex, label: str, tolerance: float = 2e-8) -> float:
+    scalar = complex(value)
+    if abs(scalar.imag) > tolerance:
+        raise RuntimeError(f"{label} has imaginary component {scalar.imag:.3e}")
+    return float(scalar.real)
+
+
+def analyze(
+    cfg: Dict[str, Any],
+    stage1b_cfg: Dict[str, Any],
+    stage1b_runs: Path,
+    stage2b_runs: Path,
+) -> None:
+    work = resolve_work_dir(cfg)
+    ztasks = zero_tasks(cfg)
+    ftasks = field_tasks(cfg)
+    zero_by_r: Dict[float, Dict[str, Any]] = {}
+    field_by_key: Dict[Tuple[float, str, float, str], Dict[str, Any]] = {}
+    raw_field_rows: List[Dict[str, Any]] = []
+
+    for task in ztasks:
+        digest = task_digest("zero", task, cfg, stage1b_cfg)
+        frame = load_frame(zero_checkpoint(work, task), digest)
+        zero_by_r[round(float(task["R_Angstrom"]), 10)] = frame
+    for task in ftasks:
+        digest = task_digest("field", task, cfg, stage1b_cfg)
+        frame = load_frame(field_checkpoint(work, int(task["task_index"])), digest)
+        field_by_key[field_key(task)] = frame
+        raw_field_rows.append(frame["row"])
+    write_csv(work / "field_states.csv", raw_field_rows)
+
+    branch_rows = stage1b_rows(stage1b_runs)
+    rc = crossing_r(stage1b_runs)
+    direct = independent_direct_couplings(stage2b_runs)
+    active = stage1b_cfg["active_space"]
+    ncore = int(active["avas_ncore"])
+    ncas = int(active["ncas"])
+    nelecas = tuple(int(value) for value in active["nelecas"])
+    validation = cfg["stage2c"]["validation"]
+    pair_rows: List[Dict[str, Any]] = []
+
+    for r_value in cfg["stage2c"]["geometries_Angstrom"]:
+        r_key = round(float(r_value), 10)
+        zero = zero_by_r[r_key]
+        zero_energies = np.asarray(zero["energies"], dtype=float)
+        anchor = stage1b_anchor(float(r_value), branch_rows, rc)
+        anchor_diag = np.asarray(
+            [anchor["X_energy_Eh"], anchor["A_energy_Eh"], anchor["A_energy_Eh"]],
+            dtype=float,
+        )
+        shifts = anchor_diag - zero_energies
+        gap = float(anchor["X_minus_A_gap_Eh"])
+        at_crossing = abs(gap) <= float(validation["crossing_gap_threshold_Eh"])
+        zero_ground = float(min(anchor_diag))
+        c1_mol = build_molecule(float(r_value), electronic_config(stage1b_cfg, cfg), verbose=0)
+        direct_row = direct[r_key]
+
+        for axis in cfg["stage2c"]["axes"]:
+            rank, background_indices, response_kind = response_subspaces(
+                str(axis), gap, at_crossing
+            )
+            direct_mu = float(
+                direct_row[
+                    "mu_x_direct_au" if axis == "x" else "mu_y_direct_au"
+                ]
+            ) if axis in TRANSVERSE_COUPLING else 0.5 * (
+                float(direct_row["mu_x_direct_au"])
+                + float(direct_row["mu_y_direct_au"])
+            )
+            for magnitude in cfg["stage2c"]["field_magnitudes_au"][axis]:
+                field = float(magnitude)
+                plus = field_by_key[(r_key, axis, field, "plus")]
+                minus = field_by_key[(r_key, axis, field, "minus")]
+                hp = np.asarray(plus["transported_hamiltonian_Eh"])
+                hm = np.asarray(minus["transported_hamiltonian_Eh"])
+                qp = np.asarray(plus["polar_transport"])
+                qm = np.asarray(minus["polar_transport"])
+                h_eff_p = hermitize(hp + np.diag(shifts))
+                h_eff_m = hermitize(hm + np.diag(shifts))
+                ep, cp, eval_p = _mean_lowest_eigenspace(h_eff_p, rank)
+                em, cm, eval_m = _mean_lowest_eigenspace(h_eff_m, rank)
+
+                overlap_pm = frame_overlap(
+                    c1_mol,
+                    plus["mo"],
+                    plus["ci"],
+                    c1_mol,
+                    minus["mo"],
+                    minus["ci"],
+                    ncore,
+                    ncas,
+                    nelecas,
+                )
+                metric_mean, metric_trace, physical_sv = subspace_metric(
+                    cp, cm, qp, qm, overlap_pm, field
+                )
+                basis = np.eye(3, dtype=complex)[:, background_indices]
+                bg_metric_mean, bg_metric_trace, bg_sv = subspace_metric(
+                    basis, basis, qp, qm, overlap_pm, field
+                )
+                h0 = np.diag(zero_energies)
+                h_odd = hermitize((hp - hm) / (2.0 * field))
+                alpha_matrix = hermitize(-(hp + hm - 2.0 * h0) / (field * field))
+                alpha_background = float(
+                    np.mean([_real(alpha_matrix[index, index], "alpha background") for index in background_indices])
+                )
+                alpha_apparent = -(ep + em - 2.0 * zero_ground) / (field * field)
+                if axis in TRANSVERSE_COUPLING:
+                    i, j = TRANSVERSE_COUPLING[axis]
+                    mu_transport = abs(complex(h_odd[i, j]))
+                    mu_relative = _relative_difference(mu_transport, direct_mu)
+                    forbidden_ratio = 0.0
+                else:
+                    mu_transport = max(abs(complex(h_odd[0, 1])), abs(complex(h_odd[0, 2])))
+                    mu_relative = 0.0
+                    forbidden_ratio = mu_transport / max(direct_mu, 1e-30)
+                plus_minus_difference = abs(ep - em)
+                min_transport_sv = min(
+                    float(np.min(plus["transport_singular_values"])),
+                    float(np.min(minus["transport_singular_values"])),
+                )
+                reasons: List[str] = []
+                if plus["row"].get("status") != "PASS" or minus["row"].get("status") != "PASS":
+                    reasons.append("field_state")
+                if min_transport_sv < float(validation["min_zero_field_transport_singular_value"]):
+                    reasons.append("transport_subspace")
+                if plus_minus_difference > float(validation["max_plus_minus_energy_difference_Eh"]):
+                    reasons.append("plus_minus_energy_symmetry")
+                if axis in TRANSVERSE_COUPLING and mu_relative > float(validation["max_mu_relative_difference_from_stage2b"]):
+                    reasons.append("direct_mu_control")
+                if axis == "z" and forbidden_ratio > float(validation["max_forbidden_z_to_allowed_ratio"]):
+                    reasons.append("forbidden_z_coupling")
+                pair_rows.append(
+                    {
+                        "R_Angstrom": float(r_value),
+                        "axis": axis,
+                        "field_magnitude_au": field,
+                        "stage1b_X_minus_A_gap_Eh": gap,
+                        "response_kind": response_kind,
+                        "ground_subspace_rank": rank,
+                        "background_subspace_indices": json.dumps(background_indices),
+                        "plus_ground_subspace_energy_Eh": ep,
+                        "minus_ground_subspace_energy_Eh": em,
+                        "plus_minus_energy_difference_Eh": plus_minus_difference,
+                        "alpha_adiabatic_apparent_au": alpha_apparent,
+                        "alpha_background_au": alpha_background,
+                        "metric_adiabatic_apparent_mean_au": metric_mean,
+                        "metric_adiabatic_apparent_trace_au": metric_trace,
+                        "metric_background_mean_au": bg_metric_mean,
+                        "metric_background_trace_au": bg_metric_trace,
+                        "mu_transport_abs_au": mu_transport,
+                        "mu_stage2b_direct_au": direct_mu,
+                        "mu_relative_difference_from_stage2b": mu_relative,
+                        "forbidden_z_to_allowed_ratio": forbidden_ratio,
+                        "max_abs_odd_diagonal_au": float(np.max(abs(np.diag(h_odd)))),
+                        "max_abs_even_offdiagonal_au": float(np.max(abs(alpha_matrix - np.diag(np.diag(alpha_matrix))))),
+                        "min_zero_field_transport_singular_value": min_transport_sv,
+                        "min_plus_minus_physical_singular_value": float(np.min(physical_sv)),
+                        "min_plus_minus_background_singular_value": float(np.min(bg_sv)),
+                        "status": "PASS" if not reasons else "AMBIGUOUS",
+                        "reasons": ";".join(reasons),
+                    }
+                )
+
+    limit_rows: List[Dict[str, Any]] = []
+    grouped: Dict[Tuple[float, str], List[Dict[str, Any]]] = {}
+    for row in pair_rows:
+        grouped.setdefault((round(float(row["R_Angstrom"]), 10), str(row["axis"])), []).append(row)
+
+    for (r_key, axis), rows in grouped.items():
+        rows.sort(key=lambda row: float(row["field_magnitude_au"]))
+        fields = [float(row["field_magnitude_au"]) for row in rows]
+        field2 = [value * value for value in fields]
+        gap = float(rows[0]["stage1b_X_minus_A_gap_Eh"])
+        response_kind = str(rows[0]["response_kind"])
+        at_cusp = response_kind == "exact_crossing_abs_F_cusp"
+        at_longitudinal_crossing = response_kind == "exact_crossing_longitudinal_rank3"
+        pair_nonpass = [row for row in rows if row["status"] != "PASS"]
+        mu_limit, mu_rms = _linear_intercept(
+            field2, [float(row["mu_transport_abs_au"]) for row in rows]
+        )
+        alpha_bg, alpha_bg_rms = _linear_intercept(
+            field2, [float(row["alpha_background_au"]) for row in rows]
+        )
+        metric_bg, metric_bg_rms = _linear_intercept(
+            field2, [float(row["metric_background_mean_au"]) for row in rows]
+        )
+        direct_mu = float(rows[0]["mu_stage2b_direct_au"])
+        reasons: List[str] = []
+        if pair_nonpass:
+            reasons.append("pair_gate")
+        if axis in TRANSVERSE_COUPLING and _relative_difference(mu_limit, direct_mu) > float(validation["max_mu_relative_difference_from_stage2b"]):
+            reasons.append("mu_limit_control")
+        if axis == "z" and mu_limit / max(direct_mu, 1e-30) > float(validation["max_forbidden_z_to_allowed_ratio"]):
+            reasons.append("forbidden_z_limit")
+
+        row_out: Dict[str, Any] = {
+            "R_Angstrom": float(rows[0]["R_Angstrom"]),
+            "axis": axis,
+            "stage1b_X_minus_A_gap_Eh": gap,
+            "response_kind": response_kind,
+            "fields_au": json.dumps(fields),
+            "mu_transport_limit_au": mu_limit,
+            "mu_stage2b_direct_au": direct_mu,
+            "mu_limit_relative_difference_from_stage2b": _relative_difference(mu_limit, direct_mu) if axis in TRANSVERSE_COUPLING else "",
+            "mu_fit_relative_rms": mu_rms,
+            "alpha_background_limit_au": alpha_bg,
+            "alpha_background_fit_relative_rms": alpha_bg_rms,
+            "metric_background_limit_mean_au": metric_bg,
+            "metric_background_fit_relative_rms": metric_bg_rms,
+            "alpha_zero_field_au": "",
+            "metric_zero_field_mean_au": "",
+            "alpha_singular_au": "",
+            "metric_singular_au": "",
+            "alpha_closure_relative_error": "",
+            "metric_closure_relative_error": "",
+            "cusp_slope_abs_dE_dF_au": "",
+            "limit_window_relative_change": "",
+        }
+        if at_cusp:
+            zero_ground = min(
+                stage1b_anchor(float(rows[0]["R_Angstrom"]), branch_rows, rc)["X_energy_Eh"],
+                stage1b_anchor(float(rows[0]["R_Angstrom"]), branch_rows, rc)["A_energy_Eh"],
+            )
+            apparent_slopes = [
+                -0.5
+                * (
+                    float(item["plus_ground_subspace_energy_Eh"])
+                    + float(item["minus_ground_subspace_energy_Eh"])
+                    - 2.0 * zero_ground
+                )
+                / float(item["field_magnitude_au"])
+                for item in rows
+            ]
+            cusp_slope, cusp_rms = _linear_intercept(fields, apparent_slopes)
+            row_out["cusp_slope_abs_dE_dF_au"] = cusp_slope
+            row_out["cusp_fit_relative_rms"] = cusp_rms
+            row_out["alpha_zero_field_au"] = "not_reported_abs_F_cusp"
+            row_out["metric_zero_field_mean_au"] = "not_reported_abs_F_cusp"
+            if _relative_difference(cusp_slope, direct_mu) > float(validation["max_mu_relative_difference_from_stage2b"]):
+                reasons.append("cusp_slope_control")
+        elif at_longitudinal_crossing:
+            row_out["alpha_zero_field_au"] = "not_reported_rank3_zero_field_degeneracy"
+            row_out["metric_zero_field_mean_au"] = "not_reported_rank3_zero_field_degeneracy"
+        else:
+            alpha0, alpha_rms = _linear_intercept(
+                field2, [float(item["alpha_adiabatic_apparent_au"]) for item in rows]
+            )
+            metric0, metric_rms = _linear_intercept(
+                field2, [float(item["metric_adiabatic_apparent_mean_au"]) for item in rows]
+            )
+            alpha_window = _window_change(
+                field2, [float(item["alpha_adiabatic_apparent_au"]) for item in rows], alpha0
+            )
+            metric_window = _window_change(
+                field2, [float(item["metric_adiabatic_apparent_mean_au"]) for item in rows], metric0
+            )
+            if axis in TRANSVERSE_COUPLING:
+                alpha_singular = 2.0 * mu_limit * mu_limit / abs(gap)
+                metric_singular = mu_limit * mu_limit / (gap * gap)
+            else:
+                alpha_singular = 0.0
+                metric_singular = 0.0
+            alpha_prediction = alpha_bg + alpha_singular
+            metric_prediction = metric_bg + metric_singular
+            alpha_closure = _relative_difference(alpha0, alpha_prediction)
+            metric_closure = _relative_difference(metric0, metric_prediction)
+            window = max(alpha_window, metric_window)
+            row_out.update(
+                {
+                    "alpha_zero_field_au": alpha0,
+                    "alpha_fit_relative_rms": alpha_rms,
+                    "metric_zero_field_mean_au": metric0,
+                    "metric_fit_relative_rms": metric_rms,
+                    "alpha_singular_au": alpha_singular,
+                    "metric_singular_au": metric_singular,
+                    "alpha_background_plus_singular_au": alpha_prediction,
+                    "metric_background_plus_singular_au": metric_prediction,
+                    "alpha_closure_relative_error": alpha_closure,
+                    "metric_closure_relative_error": metric_closure,
+                    "limit_window_relative_change": window,
+                }
+            )
+            if window > float(validation["max_limit_window_relative_change"]):
+                reasons.append("field_window")
+            if alpha_closure > float(validation["max_alpha_closure_relative_error"]):
+                reasons.append("alpha_closure")
+            if metric_closure > float(validation["max_metric_closure_relative_error"]):
+                reasons.append("metric_closure")
+        row_out["status"] = "PASS" if not reasons else "AMBIGUOUS"
+        row_out["reasons"] = ";".join(reasons)
+        limit_rows.append(row_out)
+
+    # Cylindrical x/y equivalence is a scientific control, not an assumption.
+    by_raxis = {
+        (round(float(row["R_Angstrom"]), 10), str(row["axis"])): row
+        for row in limit_rows
+    }
+    for r_value in cfg["stage2c"]["geometries_Angstrom"]:
+        xrow = by_raxis[(round(float(r_value), 10), "x")]
+        yrow = by_raxis[(round(float(r_value), 10), "y")]
+        comparisons: List[float] = [
+            _relative_difference(
+                float(xrow["mu_transport_limit_au"]),
+                float(yrow["mu_transport_limit_au"]),
+            )
+        ]
+        for key in ("alpha_zero_field_au", "metric_zero_field_mean_au", "cusp_slope_abs_dE_dF_au"):
+            try:
+                comparisons.append(_relative_difference(float(xrow[key]), float(yrow[key])))
+            except (TypeError, ValueError):
+                pass
+        xy_difference = max(comparisons)
+        xrow["xy_response_relative_difference"] = xy_difference
+        yrow["xy_response_relative_difference"] = xy_difference
+        if xy_difference > float(validation["max_xy_response_relative_difference"]):
+            for row in (xrow, yrow):
+                existing = [value for value in str(row["reasons"]).split(";") if value]
+                existing.append("xy_equivalence")
+                row["reasons"] = ";".join(existing)
+                row["status"] = "AMBIGUOUS"
+
+    write_csv(work / "transported_field_pairs.csv", pair_rows)
+    write_csv(work / "transported_response_limits.csv", limit_rows)
+    warnings: List[str] = []
+    nonpass_pairs = [row for row in pair_rows if row["status"] != "PASS"]
+    nonpass_limits = [row for row in limit_rows if row["status"] != "PASS"]
+    if nonpass_pairs:
+        warnings.append(f"{len(nonpass_pairs)} transported field pairs failed validation")
+    if nonpass_limits:
+        warnings.append(f"{len(nonpass_limits)} zero-field limits failed validation")
+    finite_limits = [
+        row
+        for row in limit_rows
+        if isinstance(row.get("alpha_closure_relative_error"), (int, float))
+    ]
+    plateau_rows = [
+        row
+        for row in raw_field_rows
+        if row.get("stationary_plateau_accepted") is True
+        or str(row.get("stationary_plateau_accepted", "")).lower() == "true"
+    ]
+    unauthorized_plateau = [
+        row for row in plateau_rows if targeted_field_rescue(row) is None
+    ]
+    if unauthorized_plateau:
+        raise RuntimeError(
+            f"Unauthorized stationary-plateau field states: {unauthorized_plateau}"
+        )
+    summary = {
+        "status": "transported_response_pass" if not warnings else "needs_review",
+        "protocol_version": PROTOCOL_VERSION,
+        "method": "equal-root SA3-CASSCF(6,8)/aug-cc-pVTZ polar-transport finite field",
+        "stage1b_crossing_R_Angstrom": rc,
+        "zero_frame_tasks": len(ztasks),
+        "field_state_tasks": len(ftasks),
+        "paired_field_rows": len(pair_rows),
+        "response_limit_rows": len(limit_rows),
+        "targeted_stationary_plateau_rows": len(plateau_rows),
+        "max_accepted_stationary_plateau_gradient": max(
+            (float(row["last_orbital_gradient"]) for row in plateau_rows),
+            default=0.0,
+        ),
+        "max_abs_s2_error": max(float(row["max_abs_s2_error"]) for row in raw_field_rows),
+        "min_transport_singular_value": min(float(row["min_zero_field_transport_singular_value"]) for row in raw_field_rows),
+        "max_mu_limit_relative_difference_from_stage2b": max(
+            (float(row["mu_limit_relative_difference_from_stage2b"]) for row in limit_rows if row["axis"] in TRANSVERSE_COUPLING),
+            default=0.0,
+        ),
+        "max_xy_response_relative_difference": max(
+            (float(row.get("xy_response_relative_difference", 0.0)) for row in limit_rows),
+            default=0.0,
+        ),
+        "max_alpha_closure_relative_error": max(
+            (float(row["alpha_closure_relative_error"]) for row in finite_limits),
+            default=0.0,
+        ),
+        "max_metric_closure_relative_error": max(
+            (float(row["metric_closure_relative_error"]) for row in finite_limits),
+            default=0.0,
+        ),
+        "warnings": warnings,
+        "outputs": {
+            "field_states": str(work / "field_states.csv"),
+            "paired_response": str(work / "transported_field_pairs.csv"),
+            "response_limits": str(work / "transported_response_limits.csv"),
+        },
+        "scientific_note": (
+            "The finite-field Hamiltonian is transported as a complete SA3 frame. "
+            "Root labels are never assigned in C1. At Rc the transverse response is "
+            "reported as a |F| cusp, not as a finite polarizability or finite metric."
+        ),
+    }
+    write_json(work / "B2_stage2c_summary.json", summary)
+    print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
+
+
+def check_environment(
+    cfg: Dict[str, Any],
+    stage1b_cfg: Dict[str, Any],
+    stage1b_runs: Path,
+    stage2b_runs: Path,
+) -> None:
+    _, pyscf, _, _, _, _, _ = require_runtime()
+    active = stage1b_cfg["active_space"]
+    if int(active["ncas"]) != 8 or sum(int(value) for value in active["nelecas"]) != 6:
+        raise RuntimeError("Stage 2C requires the audited CASSCF(6,8) space")
+    if tuple(root["name"] for root in cfg["stage2c"]["zero_roots"]) != ROOT_ORDER:
+        raise RuntimeError(f"Zero-frame root order must be {ROOT_ORDER}")
+    if abs(sum(float(value) for value in cfg["stage2c"]["weights"]) - 1.0) > 1e-12:
+        raise RuntimeError("SA3 weights do not sum to one")
+    for path in (
+        stage1b_runs / "B2_symmetry_branch_map.csv",
+        stage1b_runs / "B2_stage1b_summary.json",
+        stage2b_runs / "B2_stage2b_summary.json",
+        stage2b_runs / "direct_transition_couplings.csv",
+        stage2b_runs / "sa3_all_ensembles.csv",
+    ):
+        if not path.exists():
+            raise FileNotFoundError(path)
+    stage2b_summary = json.loads((stage2b_runs / "B2_stage2b_summary.json").read_text())
+    if stage2b_summary.get("status") != "two_level_protocol_pass":
+        raise RuntimeError(
+            f"Stage 2B is not scientifically complete: {stage2b_summary.get('status')}"
+        )
+    branch = stage1b_rows(stage1b_runs)
+    missing: List[str] = []
+    reused = 0
+    computed = 0
+    for task in zero_tasks(cfg):
+        r_value = float(task["R_Angstrom"])
+        source = stage2b_source(stage2b_runs, r_value)
+        if source is not None:
+            reused += 1
+            continue
+        computed += 1
+        seed_r = nearest_seed_r(r_value, branch)
+        for root in ROOT_ORDER:
+            path = state_path(stage1b_runs, root, seed_r)
+            if not path.exists():
+                missing.append(str(path))
+    if missing:
+        raise FileNotFoundError("Missing zero-frame inputs:\n" + "\n".join(sorted(set(missing))))
+    probe = build_molecule(
+        float(cfg["stage2c"]["geometries_Angstrom"][0]),
+        electronic_config(stage1b_cfg, cfg),
+        verbose=0,
+    )
+    if bool(getattr(probe, "symmetry", False)):
+        raise RuntimeError("Finite-field molecule must be C1 (symmetry disabled)")
+    print(f"PySCF:                    {pyscf.__version__}")
+    print(f"Stage 1B runs:            {stage1b_runs}")
+    print(f"Stage 2B direct controls: {stage2b_runs}")
+    print(f"Stage 2C output:          {resolve_work_dir(cfg)}")
+    print(f"Zero frames:              {len(zero_tasks(cfg))} ({reused} reuse, {computed} new)")
+    print(f"Finite-field SA3 tasks:   {len(field_tasks(cfg))}")
+    print(f"Paired response points:   {len(field_tasks(cfg)) // 2}")
+    print(f"Stage 1B config hash:     {config_digest(stage1b_cfg)}")
+    print("CHECK PASS")
+
+
+def write_manifest(cfg: Dict[str, Any], kind: str, count_only: bool = False) -> None:
+    tasks = zero_tasks(cfg) if kind == "zero" else field_tasks(cfg)
+    if count_only:
+        print(len(tasks))
+        return
+    work = resolve_work_dir(cfg)
+    path = work / f"{kind}_task_manifest.csv"
+    write_csv(path, tasks)
+    print(path)
+
+
+def audit(cfg: Dict[str, Any]) -> None:
+    work = resolve_work_dir(cfg)
+    errors: List[str] = []
+    for task in zero_tasks(cfg):
+        path = zero_csv(work, task)
+        h5_path = zero_checkpoint(work, task)
+        if not path.exists() or not h5_path.exists():
+            errors.append(f"zero R={task['R_Angstrom']}: missing output")
+            continue
+        rows = read_csv(path)
+        if len(rows) != 1 or rows[0].get("status") != "PASS":
+            errors.append(f"zero R={task['R_Angstrom']}: non-PASS")
+    for task in field_tasks(cfg):
+        index = int(task["task_index"])
+        path = field_csv(work, index)
+        h5_path = field_checkpoint(work, index)
+        if not path.exists() or not h5_path.exists():
+            errors.append(f"field task {index:03d}: missing output")
+            continue
+        rows = read_csv(path)
+        if len(rows) != 1 or rows[0].get("status") != "PASS":
+            errors.append(f"field task {index:03d}: non-PASS")
+    expected_tables = {
+        "field_states.csv": len(field_tasks(cfg)),
+        "transported_field_pairs.csv": len(field_tasks(cfg)) // 2,
+        "transported_response_limits.csv": len(cfg["stage2c"]["geometries_Angstrom"]) * len(cfg["stage2c"]["axes"]),
+    }
+    for name, expected in expected_tables.items():
+        path = work / name
+        if not path.exists():
+            errors.append(f"missing {name}")
+            continue
+        rows = read_csv(path)
+        if len(rows) != expected:
+            errors.append(f"{name}: rows={len(rows)}, expected={expected}")
+        nonpass = [row for row in rows if row.get("status") != "PASS"]
+        if nonpass:
+            errors.append(f"{name}: {len(nonpass)} non-PASS rows")
+    summary_path = work / "B2_stage2c_summary.json"
+    if not summary_path.exists():
+        errors.append("missing B2_stage2c_summary.json")
+    else:
+        summary = json.loads(summary_path.read_text())
+        if summary.get("status") != "transported_response_pass":
+            errors.append(f"summary status={summary.get('status')}")
+        if summary.get("warnings"):
+            errors.append(f"summary warnings={summary.get('warnings')}")
+    print("STAGE 2C TRANSPORTED-RESPONSE AUDIT")
+    print(f"Work directory: {work}")
+    if errors:
+        print("AUDIT FAILED")
+        for error in errors:
+            print(f"  - {error}")
+        raise SystemExit(1)
+    print(
+        f"AUDIT PASS: {len(zero_tasks(cfg))} zero frames, "
+        f"{len(field_tasks(cfg))} field states, {len(field_tasks(cfg)) // 2} pairs"
+    )
+
+
+def self_test(config_path: Path) -> None:
+    cfg = load_config(config_path)
+    geometries = cfg["stage2c"]["geometries_Angstrom"]
+    axes = cfg["stage2c"]["axes"]
+    pair_count_per_geometry = sum(
+        len(cfg["stage2c"]["field_magnitudes_au"][axis]) for axis in axes
+    )
+    assert len(zero_tasks(cfg)) == len(geometries)
+    assert len(field_tasks(cfg)) == 2 * len(geometries) * pair_count_per_geometry
+    assert len(field_tasks(cfg)) // 2 == len(geometries) * pair_count_per_geometry
+    assert len(geometries) > 0
+    assert field_tasks(cfg)[0]["sign"] == "plus"
+    assert field_tasks(cfg)[1]["sign"] == "minus"
+    tasks_by_index = {
+        int(task["task_index"]): task for task in field_tasks(cfg)
+    }
+    for index, sign in ((12, "plus"), (13, "minus")):
+        task = tasks_by_index[index]
+        assert task["R_Angstrom"] == 1.93
+        assert task["axis"] == "z"
+        assert task["field_magnitude_au"] == 1.0e-4
+        assert task["sign"] == sign
+        rescue = targeted_field_rescue(task)
+        assert rescue is not None
+        assert rescue["continuation_field_magnitude_au"] == 2.5e-4
+        assert rescue["stationary_plateau_grad_tol"] == 1.0e-6
+
+    # Gauge test: phases and root permutations must not alter H_transport.
+    rng = np.random.default_rng(14027)
+    trial = rng.normal(size=(3, 3)) + 1j * rng.normal(size=(3, 3))
+    unitary, _ = np.linalg.qr(trial)
+    energies = np.asarray([-5.2, -5.0, -4.8])
+    reference = unitary @ np.diag(energies) @ unitary.conj().T
+    observed, _, singular = transported_hamiltonian(unitary, energies)
+    assert np.max(abs(reference - observed)) < 1e-12
+    assert np.max(abs(singular - 1.0)) < 1e-12
+    permutation = np.asarray([2, 0, 1])
+    phases = np.exp(1j * np.asarray([0.37, -1.12, 2.03]))
+    overlap_changed = unitary[:, permutation] * phases[np.newaxis, :]
+    changed_energies = energies[permutation]
+    changed, _, _ = transported_hamiltonian(overlap_changed, changed_energies)
+    assert np.max(abs(reference - changed)) < 1e-12
+
+    # Two-level cusp and finite-gap limits.
+    mu = 0.1974
+    field = 2.5e-5
+    crossing = np.asarray([[0.0, mu * field], [mu * field, 0.0]])
+    crossing_e = np.linalg.eigvalsh(crossing)
+    assert abs(crossing_e[0] + mu * field) < 1e-14
+    gap = 5e-4
+    finite = np.asarray([[0.0, mu * field], [mu * field, gap]])
+    finite_e = np.linalg.eigvalsh(finite)
+    alpha_apparent = -2.0 * finite_e[0] / (field * field)
+    assert abs(alpha_apparent - 2.0 * mu * mu / gap) / alpha_apparent < 1e-4
+
+    h_plus = np.asarray([[0.0, mu * 1e-7], [mu * 1e-7, gap]])
+    h_minus = np.asarray([[0.0, -mu * 1e-7], [-mu * 1e-7, gap]])
+    _, c_plus = np.linalg.eigh(h_plus)
+    _, c_minus = np.linalg.eigh(h_minus)
+    metric_two_level, _, _ = subspace_metric(
+        c_plus[:, :1],
+        c_minus[:, :1],
+        np.eye(2),
+        np.eye(2),
+        np.eye(2),
+        1e-7,
+    )
+    expected_metric = mu * mu / (gap * gap)
+    assert abs(metric_two_level - expected_metric) / expected_metric < 2e-6
+
+    # Rank-aware fidelity normalization.
+    identity = np.eye(3, dtype=complex)
+    coeff = identity[:, :2]
+    mean_metric, trace_metric, values = subspace_metric(
+        coeff, coeff, identity, identity, identity, field
+    )
+    assert mean_metric == 0.0 and trace_metric == 0.0
+    assert np.max(abs(values - 1.0)) < 1e-14
+    print("SELF_TEST PASS")
+
+
+def make_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+    self_item = sub.add_parser("self-test")
+    self_item.add_argument("--config", type=Path, default=Path("config_stage2c.json"))
+    for name in (
+        "check",
+        "zero-manifest",
+        "zero-worker",
+        "field-manifest",
+        "field-worker",
+        "field-worker-rescue",
+        "analyze",
+    ):
+        item = sub.add_parser(name)
+        item.add_argument("--config", type=Path, default=Path("config_stage2c.json"))
+        item.add_argument("--stage1b-config", type=Path, default=Path("config_stage1b.json"))
+        item.add_argument("--stage1b-runs", type=Path)
+        item.add_argument("--stage2b-runs", type=Path)
+        if name.endswith("manifest"):
+            item.add_argument("--count-only", action="store_true")
+        if name.endswith("worker") or name == "field-worker-rescue":
+            item.add_argument("--task-index", type=int, required=True)
+    audit_item = sub.add_parser("audit")
+    audit_item.add_argument("--config", type=Path, default=Path("config_stage2c.json"))
+    return parser
+
+
+def main() -> None:
+    args = make_parser().parse_args()
+    if args.command == "self-test":
+        self_test(args.config)
+        return
+    cfg = load_config(args.config)
+    if args.command == "audit":
+        audit(cfg)
+        return
+    stage1b_cfg = load_config(args.stage1b_config)
+    stage1b_runs = resolve_stage1b_runs(cfg, args.stage1b_runs)
+    stage2b_runs = resolve_stage2b_runs(cfg, args.stage2b_runs)
+    if args.command == "check":
+        check_environment(cfg, stage1b_cfg, stage1b_runs, stage2b_runs)
+    elif args.command == "zero-manifest":
+        write_manifest(cfg, "zero", args.count_only)
+    elif args.command == "field-manifest":
+        write_manifest(cfg, "field", args.count_only)
+    elif args.command == "zero-worker":
+        run_zero_worker(
+            cfg, stage1b_cfg, stage1b_runs, stage2b_runs, args.task_index
+        )
+    elif args.command == "field-worker":
+        run_field_worker(cfg, stage1b_cfg, stage1b_runs, args.task_index)
+    elif args.command == "field-worker-rescue":
+        run_field_worker(
+            cfg,
+            stage1b_cfg,
+            stage1b_runs,
+            args.task_index,
+            targeted_rescue=True,
+        )
+    elif args.command == "analyze":
+        analyze(cfg, stage1b_cfg, stage1b_runs, stage2b_runs)
+    else:  # pragma: no cover
+        raise AssertionError(args.command)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception:
+        traceback.print_exc()
+        raise
+#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='cu02', release='4.18.0-193.el8.x86_64', version='#1 SMP Fri May 8 10:59:10 UTC 2020', machine='x86_64')  Threads 8
+Python 3.11.15 | packaged by conda-forge | (main, Aug 11 2026, 10:26:29) [GCC 14.4.0]
+numpy 2.3.5  scipy 1.17.1  h5py 3.16.0
+Date: Fri Aug 21 02:25:45 2026
+PySCF version 2.13.1
+PySCF path  /home/zdb/miniconda3/envs/osmo4-mokit/lib/python3.11/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 2
+[INPUT] num. electrons = 10
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 2
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = Angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 B      0.000000000000   0.000000000000  -0.965000000000 AA    0.000000000000   0.000000000000  -1.823585710205 Bohr   0.0
+[INPUT]  2 B      0.000000000000   0.000000000000   0.965000000000 AA    0.000000000000   0.000000000000   1.823585710205 Bohr   0.0
+
+nuclear repulsion = 6.85462708445596
+number of shells = 26
+number of NR pGTOs = 116
+number of NR cGTOs = 92
+basis = aug-cc-pvtz
+ecp = {}
+CPU time:         0.55
+TARGETED RESCUE task=013 continuation_seed=015 strict_grad_tol=5.000e-07 plateau_grad_tol=1.000e-06
+FIELD task=013 R=1.9300000000 axis=z F=-1.000e-04 seed_R=1.9300
+
+
+******** <class 'pyscf.scf.rohf.ROHF'> ********
+method = ROHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0.0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-12
+SCF conv_tol_grad = 1e-08
+SCF max_cycles = 300
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_scratch/field_013/tmphqg6udgf
+max_memory 24000 MB (current use 120 MB)
+num. doubly occ = 4  num. singly occ = 2
+Overwritten attributes  get_hcore  of <class 'pyscf.scf.rohf.ROHF'>
+init E= -49.0727780486395
+  HOMO = -0.134552606503425  LUMO = -0.0340694671594637
+cycle= 1 E= -49.0727782009105  delta_E= -1.52e-07  |g|= 0.000636  |ddm|= 0.00105
+  HOMO = -0.134552473624931  LUMO = -0.0340694746717505
+cycle= 2 E= -49.0727782123424  delta_E= -1.14e-08  |g|= 0.000566  |ddm|= 0.000962
+  HOMO = -0.134552532487784  LUMO = -0.0340693906011857
+cycle= 3 E= -49.0727784342656  delta_E= -2.22e-07  |g|= 5.78e-05  |ddm|= 0.000495
+  HOMO = -0.13455257770842  LUMO = -0.0340693795383142
+cycle= 4 E= -49.0727784365699  delta_E= -2.3e-09  |g|= 6.67e-06  |ddm|= 8.29e-05
+  HOMO = -0.134552566327993  LUMO = -0.0340693828451428
+cycle= 5 E= -49.0727784366673  delta_E= -9.74e-11  |g|= 6.1e-06  |ddm|= 2.4e-05
+  HOMO = -0.134552562609193  LUMO = -0.0340693767208959
+cycle= 6 E= -49.0727784367504  delta_E= -8.31e-11  |g|= 4.72e-06  |ddm|= 1.72e-05
+  HOMO = -0.134552572015266  LUMO = -0.0340693758184507
+cycle= 7 E= -49.072778436852  delta_E= -1.02e-10  |g|= 2.15e-06  |ddm|= 2.65e-05
+  HOMO = -0.13455256613556  LUMO = -0.0340693726311878
+cycle= 8 E= -49.0727784368761  delta_E= -2.4e-11  |g|= 3.14e-07  |ddm|= 1.57e-05
+  HOMO = -0.134552567427097  LUMO = -0.0340693733782302
+cycle= 9 E= -49.0727784368766  delta_E= -5.26e-13  |g|= 7.44e-09  |ddm|= 2.51e-06
+  HOMO = -0.134552567116676  LUMO = -0.0340693730499817
+Extra cycle  E= -49.0727784368766  delta_E= 4.26e-14  |g|= 2.07e-09  |ddm|= 3.53e-08
+converged SCF energy = -49.0727784368766
+
+******** <class 'pyscf.mcscf.addons.StateAverageCASSCF'> ********
+CAS (4e+2e, 8o), ncore = 2, nvir = 82
+max_cycle_macro = 300
+max_cycle_micro = 12
+conv_tol = 1e-11
+conv_tol_grad = 5e-07
+orbital rotation max_stepsize = 0.02
+orbital rotation threshold for CI restart = 0.01
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 1e-08
+augmented hessian ah_start_tol = 2.5
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = False
+canonicalization = False
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_scratch/field_013/tmphqg6udgf
+max_memory 24000 MB (current use 200 MB)
+internal_rotation = True
+******** <class 'pyscf.mcscf.addons.StateAverageSpinPenaltyFCISolver'> ********
+max. cycles = 300
+conv_tol = 1e-12
+davidson only = True
+linear dependence = 1e-14
+level shift = 0.001
+max iter space = 12
+max_memory 24000 MB
+nroots = 3
+pspace_size = 400
+spin = 2
+State-average over 3 states with weights [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
+CASCI E = -49.1920820292699  S^2 = 2.0000000
+macro iter   1 ( 34 JK    8 micro), CASSCF E = -49.1920823183782  dE = -2.89108286e-07  S^2 = 2.0000000
+               |grad[o]|=0.00042  |ddm|=0.00018  |maxRot[o]|=0.000438
+macro iter   2 (  1 JK    1 micro), CASSCF E = -49.1920823183786  dE = -4.47641924e-13  S^2 = 2.0000000
+               |grad[o]|=6.3e-07  |ddm|=3.05e-07  |maxRot[o]|=    0
+macro iter   3 (  1 JK    1 micro), CASSCF E = -49.1920823183788  dE = -2.20268248e-13  S^2 = 2.0000000
+               |grad[o]|=6.81e-07  |ddm|=2.67e-07  |maxRot[o]|=    0
+macro iter   4 (  1 JK    1 micro), CASSCF E = -49.1920823183789  dE = -9.94759830e-14  S^2 = 2.0000000
+               |grad[o]|=7.22e-07  |ddm|=1.98e-07  |maxRot[o]|=    0
+macro iter   5 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -5.68434189e-14  S^2 = 2.0000000
+               |grad[o]|=7.53e-07  |ddm|=1.46e-07  |maxRot[o]|=    0
+macro iter   6 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -2.84217094e-14  S^2 = 2.0000000
+               |grad[o]|=7.76e-07  |ddm|=1.07e-07  |maxRot[o]|=    0
+macro iter   7 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=7.92e-07  |ddm|=7.87e-08  |maxRot[o]|=    0
+macro iter   8 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.05e-07  |ddm|=5.79e-08  |maxRot[o]|=    0
+macro iter   9 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.87e-16  |maxRot[o]|=    0
+macro iter  10 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.23e-15  |maxRot[o]|=    0
+macro iter  11 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.68e-15  |maxRot[o]|=    0
+macro iter  12 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.57e-15  |maxRot[o]|=    0
+macro iter  13 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.71e-16  |maxRot[o]|=    0
+macro iter  14 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.11e-16  |maxRot[o]|=    0
+macro iter  15 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.39e-15  |maxRot[o]|=    0
+macro iter  16 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.85e-15  |maxRot[o]|=    0
+macro iter  17 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.37e-15  |maxRot[o]|=    0
+macro iter  18 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.04e-16  |maxRot[o]|=    0
+macro iter  19 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.08e-15  |maxRot[o]|=    0
+macro iter  20 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.11e-15  |maxRot[o]|=    0
+macro iter  21 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.8e-16  |maxRot[o]|=    0
+macro iter  22 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.79e-16  |maxRot[o]|=    0
+macro iter  23 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.36e-15  |maxRot[o]|=    0
+macro iter  24 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.79e-15  |maxRot[o]|=    0
+macro iter  25 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.13e-15  |maxRot[o]|=    0
+macro iter  26 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.13e-16  |maxRot[o]|=    0
+macro iter  27 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.25e-15  |maxRot[o]|=    0
+macro iter  28 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.66e-16  |maxRot[o]|=    0
+macro iter  29 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.23e-15  |maxRot[o]|=    0
+macro iter  30 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.16e-16  |maxRot[o]|=    0
+macro iter  31 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.44e-15  |maxRot[o]|=    0
+macro iter  32 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.81e-15  |maxRot[o]|=    0
+macro iter  33 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.77e-15  |maxRot[o]|=    0
+macro iter  34 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.13e-16  |maxRot[o]|=    0
+macro iter  35 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.78e-16  |maxRot[o]|=    0
+macro iter  36 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.92e-16  |maxRot[o]|=    0
+macro iter  37 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.14e-16  |maxRot[o]|=    0
+macro iter  38 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.74e-16  |maxRot[o]|=    0
+macro iter  39 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.01e-16  |maxRot[o]|=    0
+macro iter  40 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.47e-16  |maxRot[o]|=    0
+macro iter  41 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.83e-16  |maxRot[o]|=    0
+macro iter  42 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7e-16  |maxRot[o]|=    0
+macro iter  43 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.96e-15  |maxRot[o]|=    0
+macro iter  44 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.89e-16  |maxRot[o]|=    0
+macro iter  45 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.19e-16  |maxRot[o]|=    0
+macro iter  46 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.82e-16  |maxRot[o]|=    0
+macro iter  47 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.85e-15  |maxRot[o]|=    0
+macro iter  48 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.12e-16  |maxRot[o]|=    0
+macro iter  49 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.92e-15  |maxRot[o]|=    0
+macro iter  50 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.37e-16  |maxRot[o]|=    0
+macro iter  51 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.98e-16  |maxRot[o]|=    0
+macro iter  52 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.52e-15  |maxRot[o]|=    0
+macro iter  53 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.98e-15  |maxRot[o]|=    0
+macro iter  54 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.54e-16  |maxRot[o]|=    0
+macro iter  55 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.35e-15  |maxRot[o]|=    0
+macro iter  56 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.33e-16  |maxRot[o]|=    0
+macro iter  57 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.13e-15  |maxRot[o]|=    0
+macro iter  58 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.62e-16  |maxRot[o]|=    0
+macro iter  59 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.19e-16  |maxRot[o]|=    0
+macro iter  60 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.34e-15  |maxRot[o]|=    0
+macro iter  61 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.23e-16  |maxRot[o]|=    0
+macro iter  62 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.22e-16  |maxRot[o]|=    0
+macro iter  63 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.45e-15  |maxRot[o]|=    0
+macro iter  64 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.31e-15  |maxRot[o]|=    0
+macro iter  65 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.72e-16  |maxRot[o]|=    0
+macro iter  66 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.18e-15  |maxRot[o]|=    0
+macro iter  67 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.09e-15  |maxRot[o]|=    0
+macro iter  68 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.46e-15  |maxRot[o]|=    0
+macro iter  69 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.47e-15  |maxRot[o]|=    0
+macro iter  70 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.14e-15  |maxRot[o]|=    0
+macro iter  71 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.64e-15  |maxRot[o]|=    0
+macro iter  72 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.08e-15  |maxRot[o]|=    0
+macro iter  73 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.58e-15  |maxRot[o]|=    0
+macro iter  74 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.14e-15  |maxRot[o]|=    0
+macro iter  75 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.63e-16  |maxRot[o]|=    0
+macro iter  76 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.5e-15  |maxRot[o]|=    0
+macro iter  77 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.86e-15  |maxRot[o]|=    0
+macro iter  78 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.38e-15  |maxRot[o]|=    0
+macro iter  79 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.89e-15  |maxRot[o]|=    0
+macro iter  80 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.61e-16  |maxRot[o]|=    0
+macro iter  81 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.85e-16  |maxRot[o]|=    0
+macro iter  82 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.52e-16  |maxRot[o]|=    0
+macro iter  83 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.64e-15  |maxRot[o]|=    0
+macro iter  84 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.46e-15  |maxRot[o]|=    0
+macro iter  85 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.84e-15  |maxRot[o]|=    0
+macro iter  86 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.13e-16  |maxRot[o]|=    0
+macro iter  87 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.07e-15  |maxRot[o]|=    0
+macro iter  88 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.8e-15  |maxRot[o]|=    0
+macro iter  89 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.76e-16  |maxRot[o]|=    0
+macro iter  90 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.55e-15  |maxRot[o]|=    0
+macro iter  91 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.61e-16  |maxRot[o]|=    0
+macro iter  92 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.33e-16  |maxRot[o]|=    0
+macro iter  93 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.48e-15  |maxRot[o]|=    0
+macro iter  94 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.28e-16  |maxRot[o]|=    0
+macro iter  95 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.08e-15  |maxRot[o]|=    0
+macro iter  96 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.33e-15  |maxRot[o]|=    0
+macro iter  97 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.29e-15  |maxRot[o]|=    0
+macro iter  98 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.26e-16  |maxRot[o]|=    0
+macro iter  99 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.2e-15  |maxRot[o]|=    0
+macro iter 100 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.72e-16  |maxRot[o]|=    0
+macro iter 101 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.26e-16  |maxRot[o]|=    0
+macro iter 102 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.5e-16  |maxRot[o]|=    0
+macro iter 103 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.09e-16  |maxRot[o]|=    0
+macro iter 104 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.69e-15  |maxRot[o]|=    0
+macro iter 105 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.82e-16  |maxRot[o]|=    0
+macro iter 106 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.48e-15  |maxRot[o]|=    0
+macro iter 107 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.46e-16  |maxRot[o]|=    0
+macro iter 108 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.64e-16  |maxRot[o]|=    0
+macro iter 109 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.08e-16  |maxRot[o]|=    0
+macro iter 110 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.66e-16  |maxRot[o]|=    0
+macro iter 111 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.01e-15  |maxRot[o]|=    0
+macro iter 112 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.18e-16  |maxRot[o]|=    0
+macro iter 113 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.89e-15  |maxRot[o]|=    0
+macro iter 114 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.06e-15  |maxRot[o]|=    0
+macro iter 115 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.15e-15  |maxRot[o]|=    0
+macro iter 116 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.94e-16  |maxRot[o]|=    0
+macro iter 117 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.65e-15  |maxRot[o]|=    0
+macro iter 118 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.08e-15  |maxRot[o]|=    0
+macro iter 119 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.01e-15  |maxRot[o]|=    0
+macro iter 120 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.69e-16  |maxRot[o]|=    0
+macro iter 121 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.25e-16  |maxRot[o]|=    0
+macro iter 122 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.45e-16  |maxRot[o]|=    0
+macro iter 123 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.17e-16  |maxRot[o]|=    0
+macro iter 124 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.48e-16  |maxRot[o]|=    0
+macro iter 125 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.24e-15  |maxRot[o]|=    0
+macro iter 126 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.54e-16  |maxRot[o]|=    0
+macro iter 127 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.69e-16  |maxRot[o]|=    0
+macro iter 128 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.4e-16  |maxRot[o]|=    0
+macro iter 129 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.2e-15  |maxRot[o]|=    0
+macro iter 130 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.11e-16  |maxRot[o]|=    0
+macro iter 131 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.74e-16  |maxRot[o]|=    0
+macro iter 132 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.29e-15  |maxRot[o]|=    0
+macro iter 133 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.85e-16  |maxRot[o]|=    0
+macro iter 134 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.19e-15  |maxRot[o]|=    0
+macro iter 135 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.62e-16  |maxRot[o]|=    0
+macro iter 136 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.23e-16  |maxRot[o]|=    0
+macro iter 137 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.01e-16  |maxRot[o]|=    0
+macro iter 138 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.36e-15  |maxRot[o]|=    0
+macro iter 139 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.45e-15  |maxRot[o]|=    0
+macro iter 140 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.08e-15  |maxRot[o]|=    0
+macro iter 141 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.28e-15  |maxRot[o]|=    0
+macro iter 142 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.41e-16  |maxRot[o]|=    0
+macro iter 143 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.44e-15  |maxRot[o]|=    0
+macro iter 144 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.69e-15  |maxRot[o]|=    0
+macro iter 145 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.07e-15  |maxRot[o]|=    0
+macro iter 146 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.81e-16  |maxRot[o]|=    0
+macro iter 147 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.78e-16  |maxRot[o]|=    0
+macro iter 148 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.28e-16  |maxRot[o]|=    0
+macro iter 149 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.42e-16  |maxRot[o]|=    0
+macro iter 150 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.36e-16  |maxRot[o]|=    0
+macro iter 151 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.94e-15  |maxRot[o]|=    0
+macro iter 152 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.24e-16  |maxRot[o]|=    0
+macro iter 153 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.4e-15  |maxRot[o]|=    0
+macro iter 154 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.12e-15  |maxRot[o]|=    0
+macro iter 155 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.07e-15  |maxRot[o]|=    0
+macro iter 156 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.12e-15  |maxRot[o]|=    0
+macro iter 157 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.94e-16  |maxRot[o]|=    0
+macro iter 158 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.5e-16  |maxRot[o]|=    0
+macro iter 159 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.09e-15  |maxRot[o]|=    0
+macro iter 160 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -2.13162821e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.05e-15  |maxRot[o]|=    0
+macro iter 161 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  2.13162821e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.67e-16  |maxRot[o]|=    0
+macro iter 162 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.15e-15  |maxRot[o]|=    0
+macro iter 163 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.06e-15  |maxRot[o]|=    0
+macro iter 164 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.12e-16  |maxRot[o]|=    0
+macro iter 165 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.2e-15  |maxRot[o]|=    0
+macro iter 166 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.43e-15  |maxRot[o]|=    0
+macro iter 167 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.45e-15  |maxRot[o]|=    0
+macro iter 168 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.21e-15  |maxRot[o]|=    0
+macro iter 169 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.82e-16  |maxRot[o]|=    0
+macro iter 170 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.48e-15  |maxRot[o]|=    0
+macro iter 171 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.33e-15  |maxRot[o]|=    0
+macro iter 172 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.74e-16  |maxRot[o]|=    0
+macro iter 173 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.37e-15  |maxRot[o]|=    0
+macro iter 174 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.1e-15  |maxRot[o]|=    0
+macro iter 175 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.19e-15  |maxRot[o]|=    0
+macro iter 176 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.88e-15  |maxRot[o]|=    0
+macro iter 177 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.3e-15  |maxRot[o]|=    0
+macro iter 178 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.4e-16  |maxRot[o]|=    0
+macro iter 179 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.28e-15  |maxRot[o]|=    0
+macro iter 180 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.11e-15  |maxRot[o]|=    0
+macro iter 181 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.23e-16  |maxRot[o]|=    0
+macro iter 182 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.64e-15  |maxRot[o]|=    0
+macro iter 183 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.32e-15  |maxRot[o]|=    0
+macro iter 184 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.39e-15  |maxRot[o]|=    0
+macro iter 185 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.22e-15  |maxRot[o]|=    0
+macro iter 186 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.01e-16  |maxRot[o]|=    0
+macro iter 187 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.51e-15  |maxRot[o]|=    0
+macro iter 188 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.77e-16  |maxRot[o]|=    0
+macro iter 189 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.88e-15  |maxRot[o]|=    0
+macro iter 190 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.18e-15  |maxRot[o]|=    0
+macro iter 191 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.35e-15  |maxRot[o]|=    0
+macro iter 192 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.1e-15  |maxRot[o]|=    0
+macro iter 193 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.16e-16  |maxRot[o]|=    0
+macro iter 194 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.6e-15  |maxRot[o]|=    0
+macro iter 195 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.69e-16  |maxRot[o]|=    0
+macro iter 196 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.62e-16  |maxRot[o]|=    0
+macro iter 197 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.55e-15  |maxRot[o]|=    0
+macro iter 198 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.21e-15  |maxRot[o]|=    0
+macro iter 199 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.82e-16  |maxRot[o]|=    0
+macro iter 200 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.85e-16  |maxRot[o]|=    0
+macro iter 201 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.03e-16  |maxRot[o]|=    0
+macro iter 202 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.84e-16  |maxRot[o]|=    0
+macro iter 203 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.07e-15  |maxRot[o]|=    0
+macro iter 204 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.19e-15  |maxRot[o]|=    0
+macro iter 205 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.76e-15  |maxRot[o]|=    0
+macro iter 206 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.49e-15  |maxRot[o]|=    0
+macro iter 207 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.86e-15  |maxRot[o]|=    0
+macro iter 208 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.15e-15  |maxRot[o]|=    0
+macro iter 209 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.1e-15  |maxRot[o]|=    0
+macro iter 210 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.91e-16  |maxRot[o]|=    0
+macro iter 211 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.81e-16  |maxRot[o]|=    0
+macro iter 212 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.78e-16  |maxRot[o]|=    0
+macro iter 213 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.64e-15  |maxRot[o]|=    0
+macro iter 214 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9e-16  |maxRot[o]|=    0
+macro iter 215 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.45e-15  |maxRot[o]|=    0
+macro iter 216 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.06e-15  |maxRot[o]|=    0
+macro iter 217 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.28e-16  |maxRot[o]|=    0
+macro iter 218 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.91e-16  |maxRot[o]|=    0
+macro iter 219 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.44e-16  |maxRot[o]|=    0
+macro iter 220 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.64e-15  |maxRot[o]|=    0
+macro iter 221 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.09e-15  |maxRot[o]|=    0
+macro iter 222 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.79e-15  |maxRot[o]|=    0
+macro iter 223 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.33e-15  |maxRot[o]|=    0
+macro iter 224 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.58e-16  |maxRot[o]|=    0
+macro iter 225 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.02e-16  |maxRot[o]|=    0
+macro iter 226 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.52e-15  |maxRot[o]|=    0
+macro iter 227 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.03e-15  |maxRot[o]|=    0
+macro iter 228 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.19e-15  |maxRot[o]|=    0
+macro iter 229 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.46e-15  |maxRot[o]|=    0
+macro iter 230 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.01e-15  |maxRot[o]|=    0
+macro iter 231 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.55e-15  |maxRot[o]|=    0
+macro iter 232 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.2e-16  |maxRot[o]|=    0
+macro iter 233 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.37e-16  |maxRot[o]|=    0
+macro iter 234 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.15e-15  |maxRot[o]|=    0
+macro iter 235 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.51e-16  |maxRot[o]|=    0
+macro iter 236 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.58e-16  |maxRot[o]|=    0
+macro iter 237 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.87e-16  |maxRot[o]|=    0
+macro iter 238 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.53e-15  |maxRot[o]|=    0
+macro iter 239 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.76e-16  |maxRot[o]|=    0
+macro iter 240 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.86e-15  |maxRot[o]|=    0
+macro iter 241 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.05e-15  |maxRot[o]|=    0
+macro iter 242 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.42e-16  |maxRot[o]|=    0
+macro iter 243 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.5e-15  |maxRot[o]|=    0
+macro iter 244 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.04e-15  |maxRot[o]|=    0
+macro iter 245 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.06e-16  |maxRot[o]|=    0
+macro iter 246 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.36e-16  |maxRot[o]|=    0
+macro iter 247 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.13e-15  |maxRot[o]|=    0
+macro iter 248 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.16e-15  |maxRot[o]|=    0
+macro iter 249 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.08e-16  |maxRot[o]|=    0
+macro iter 250 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.08e-15  |maxRot[o]|=    0
+macro iter 251 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.58e-15  |maxRot[o]|=    0
+macro iter 252 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.19e-15  |maxRot[o]|=    0
+macro iter 253 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.36e-15  |maxRot[o]|=    0
+macro iter 254 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.03e-15  |maxRot[o]|=    0
+macro iter 255 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.15e-15  |maxRot[o]|=    0
+macro iter 256 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.06e-15  |maxRot[o]|=    0
+macro iter 257 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.43e-15  |maxRot[o]|=    0
+macro iter 258 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.36e-15  |maxRot[o]|=    0
+macro iter 259 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.32e-15  |maxRot[o]|=    0
+macro iter 260 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.44e-16  |maxRot[o]|=    0
+macro iter 261 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.15e-16  |maxRot[o]|=    0
+macro iter 262 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.2e-16  |maxRot[o]|=    0
+macro iter 263 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.9e-15  |maxRot[o]|=    0
+macro iter 264 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.84e-16  |maxRot[o]|=    0
+macro iter 265 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.8e-16  |maxRot[o]|=    0
+macro iter 266 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.17e-16  |maxRot[o]|=    0
+macro iter 267 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.57e-15  |maxRot[o]|=    0
+macro iter 268 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.91e-15  |maxRot[o]|=    0
+macro iter 269 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.58e-15  |maxRot[o]|=    0
+macro iter 270 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.09e-15  |maxRot[o]|=    0
+macro iter 271 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=7.52e-16  |maxRot[o]|=    0
+macro iter 272 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.16e-16  |maxRot[o]|=    0
+macro iter 273 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.79e-15  |maxRot[o]|=    0
+macro iter 274 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.1e-16  |maxRot[o]|=    0
+macro iter 275 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=8.25e-16  |maxRot[o]|=    0
+macro iter 276 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.92e-15  |maxRot[o]|=    0
+macro iter 277 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.34e-15  |maxRot[o]|=    0
+macro iter 278 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.95e-16  |maxRot[o]|=    0
+macro iter 279 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.21e-15  |maxRot[o]|=    0
+macro iter 280 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.01e-15  |maxRot[o]|=    0
+macro iter 281 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.75e-16  |maxRot[o]|=    0
+macro iter 282 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  7.10542736e-15  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.07e-15  |maxRot[o]|=    0
+macro iter 283 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.35e-16  |maxRot[o]|=    0
+macro iter 284 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.86e-16  |maxRot[o]|=    0
+macro iter 285 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=6.77e-16  |maxRot[o]|=    0
+macro iter 286 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2e-15  |maxRot[o]|=    0
+macro iter 287 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.47e-15  |maxRot[o]|=    0
+macro iter 288 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.92e-15  |maxRot[o]|=    0
+macro iter 289 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.59e-16  |maxRot[o]|=    0
+macro iter 290 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=3.49e-15  |maxRot[o]|=    0
+macro iter 291 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.1e-16  |maxRot[o]|=    0
+macro iter 292 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.28e-16  |maxRot[o]|=    0
+macro iter 293 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.73e-16  |maxRot[o]|=    0
+macro iter 294 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.54e-15  |maxRot[o]|=    0
+macro iter 295 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=2.09e-15  |maxRot[o]|=    0
+macro iter 296 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.28e-15  |maxRot[o]|=    0
+macro iter 297 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.41e-15  |maxRot[o]|=    0
+macro iter 298 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=9.83e-16  |maxRot[o]|=    0
+macro iter 299 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE =  0.00000000e+00  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=1.74e-15  |maxRot[o]|=    0
+macro iter 300 (  1 JK    1 micro), CASSCF E = -49.1920823183790  dE = -1.42108547e-14  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=4.35e-16  |maxRot[o]|=    0
+1-step CASSCF not converged, 300 macro (333 JK 307 micro) steps
+CASSCF energy = -49.1920823183790
+CASCI E = -49.1920823183790  E(CI) = -7.69021908637142  S^2 = 2.0000000
+CASCI state-averaged energy = -49.192082318379
+CASCI energy for each state
+  State 0 weight 0.333333  E = -49.1930105399344 S^2 = 2.0000000
+  State 1 weight 0.333333  E = -49.1916182076014 S^2 = 2.0000000
+  State 2 weight 0.333333  E = -49.1916182076014 S^2 = 2.0000000
+      C1_SA3_PRIMARY_NOT_CONVERGED Eavg=-49.19208231837904 diagnostics={'imacro': 300.0, 'de': -1.4210854715202004e-14, 'norm_gorb': 8.137757202737215e-07, 'norm_ddm': 1.649736060878484e-15}
+
+******** <class 'pyscf.mcscf.addons.StateAverageCASSCF'> ********
+CAS (4e+2e, 8o), ncore = 2, nvir = 82
+max_cycle_macro = 600
+max_cycle_micro = 12
+conv_tol = 1e-11
+conv_tol_grad = 5e-07
+orbital rotation max_stepsize = 0.01
+orbital rotation threshold for CI restart = 0.01
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 1e-08
+augmented hessian ah_start_tol = 1e-06
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = False
+canonicalization = False
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_scratch/field_013/tmphqg6udgf
+max_memory 24000 MB (current use 277 MB)
+internal_rotation = True
+******** <class 'pyscf.mcscf.addons.StateAverageSpinPenaltyFCISolver'> ********
+max. cycles = 300
+conv_tol = 1e-12
+davidson only = True
+linear dependence = 1e-14
+level shift = 0.001
+max iter space = 12
+max_memory 24000 MB
+nroots = 3
+pspace_size = 400
+spin = 2
+State-average over 3 states with weights [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
+CASCI E = -49.1920823183790  S^2 = 2.0000000
+macro iter   1 (  6 JK    2 micro), CASSCF E = -49.1920823183816  dE = -2.60769184e-12  S^2 = 2.0000000
+               |grad[o]|=8.14e-07  |ddm|=5.38e-07  |maxRot[o]|=2.32e-06
+macro iter   2 ( 16 JK    1 micro), CASSCF E = -49.1920823183817  dE = -2.13162821e-14  S^2 = 2.0000000
+               |grad[o]|=1.01e-07  |ddm|=1.33e-07  |maxRot[o]|=7.96e-08
+1-step CASSCF converged in   2 macro ( 22 JK   3 micro) steps
+CASSCF energy = -49.1920823183817
+CASCI E = -49.1920823183817  E(CI) = -7.69021908744534  S^2 = 2.0000000
+CASCI state-averaged energy = -49.1920823183817
+CASCI energy for each state
+  State 0 weight 0.333333  E = -49.1930105407074 S^2 = 2.0000000
+  State 1 weight 0.333333  E = -49.1916182072194 S^2 = 2.0000000
+  State 2 weight 0.333333  E = -49.1916182072181 S^2 = 2.0000000

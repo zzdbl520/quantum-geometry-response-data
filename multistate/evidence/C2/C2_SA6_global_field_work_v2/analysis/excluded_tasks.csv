@@ -1,0 +1,17 @@
+task_id,R_angstrom,axis,field_magnitude_au,field_sign,reason,recorded_utc,status
+8,1.0,z,5e-05,-1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+9,1.0,z,5e-05,1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+10,1.0,z,0.0001,-1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+11,1.0,z,0.0001,1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+12,1.0,z,0.00025,-1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+13,1.0,z,0.00025,1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+14,1.0,z,0.0005,-1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+15,1.0,z,0.0005,1,unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings,2026-08-28T14:10:59.820340+00:00,EXCLUDED
+800,3.0390625,z,5e-05,-1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+801,3.0390625,z,5e-05,1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+802,3.0390625,z,0.0001,-1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+803,3.0390625,z,0.0001,1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+804,3.0390625,z,0.00025,-1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+805,3.0390625,z,0.00025,1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+806,3.0390625,z,0.0005,-1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED
+807,3.0390625,z,0.0005,1,certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous,2026-08-28T14:10:59.887742+00:00,EXCLUDED

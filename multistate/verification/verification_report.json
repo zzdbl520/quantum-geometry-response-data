@@ -1,0 +1,88 @@
+{
+  "positive_support": {
+    "rank": 2,
+    "congruence_relative_error": 1.0775205412168025e-15,
+    "covariance_relative_error": 1.894077374008022e-15
+  },
+  "signed_support": {
+    "rank": 2,
+    "congruence_relative_error": 3.0191455672832326e-15,
+    "covariance_relative_error": 1.9018582751242432e-15
+  },
+  "split_cluster": {
+    "sylvester_residual": 6.520806856012869e-17,
+    "best_metric_relative_error": 1.4349467763906494e-08,
+    "best_A_relative_error": 3.4545995489196274e-08
+  },
+  "split_support_counterexample": {
+    "A": [
+      [
+        2.0,
+        1.8
+      ],
+      [
+        1.8,
+        1.6
+      ]
+    ],
+    "G": [
+      [
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0
+      ]
+    ],
+    "unsupported_relative_norm": 0.07832604499879572,
+    "projected_congruence_error": 4.440892098500626e-16
+  },
+  "three_state_cusp": {
+    "kappa": 0.1974399069446437,
+    "max_slope_error": 0.0
+  },
+  "dark_state": {
+    "response": 0.0,
+    "metric": 0.0,
+    "trace_ratio_defined": false
+  },
+  "reaction": {
+    "pair_count": 56,
+    "geometry_count": 14,
+    "signed_records": 112,
+    "fields": [
+      0.00025,
+      0.0005,
+      0.00075,
+      0.001
+    ],
+    "fieldwise_addition_max_error": 7.105427357601002e-15,
+    "full_matrix_gate": false,
+    "numerical_failure_count": 12,
+    "global_plateau_gate": false,
+    "peak_checks": [
+      {
+        "source_index": 5,
+        "median": 27.752446078113927,
+        "lower": 27.649230767386864,
+        "upper": 27.79711719554728,
+        "margin": 4.6795320634959445,
+        "component_median_sum": 27.75656289644657
+      },
+      {
+        "source_index": 9,
+        "median": 24.863862923197217,
+        "lower": 24.772464988957744,
+        "upper": 25.268333855179225,
+        "margin": 0.21165369577206405,
+        "component_median_sum": 24.86386292319721
+      }
+    ]
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  }
+}

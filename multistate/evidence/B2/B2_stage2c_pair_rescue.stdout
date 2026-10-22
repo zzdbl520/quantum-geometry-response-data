@@ -1,0 +1,69 @@
+nohup: ignoring input
+SELF_TEST PASS
+[field 012] TARGETED PAIR RESCUE START (seed 014)
+[field 012] TARGETED PAIR RESCUE DONE
+[field 013] TARGETED PAIR RESCUE START (seed 015)
+[field 013] TARGETED PAIR RESCUE DONE
+Field HDF5 inventory: 108 / 108
+Field CSV inventory:  108 / 108
+{
+  "field_state_tasks": 108,
+  "max_abs_s2_error": 5.426770144367765e-13,
+  "max_accepted_stationary_plateau_gradient": 0.0,
+  "max_alpha_closure_relative_error": 0.00017459365277916393,
+  "max_metric_closure_relative_error": 0.0005193485752111077,
+  "max_mu_limit_relative_difference_from_stage2b": 0.24557629862261687,
+  "max_xy_response_relative_difference": 2.4981904051051463e-06,
+  "method": "equal-root SA3-CASSCF(6,8)/aug-cc-pVTZ polar-transport finite field",
+  "min_transport_singular_value": 0.9999732791672128,
+  "outputs": {
+    "field_states": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/field_states.csv",
+    "paired_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/transported_field_pairs.csv",
+    "response_limits": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/transported_response_limits.csv"
+  },
+  "paired_field_rows": 54,
+  "protocol_version": "3.0-polar-transport-SA3",
+  "response_limit_rows": 18,
+  "scientific_note": "The finite-field Hamiltonian is transported as a complete SA3 frame. Root labels are never assigned in C1. At Rc the transverse response is reported as a |F| cusp, not as a finite polarizability or finite metric.",
+  "stage1b_crossing_R_Angstrom": 1.9441854605348607,
+  "status": "needs_review",
+  "targeted_stationary_plateau_rows": 0,
+  "warnings": [
+    "36 transported field pairs failed validation",
+    "12 zero-field limits failed validation"
+  ],
+  "zero_frame_tasks": 6
+}
+SELF_TEST PASS
+{
+  "analysis_version": "3.2-baseline-aware-direct-mu-hybrid",
+  "axis_response_rows": 18,
+  "explicit_cusp_rows": 0,
+  "field_states_reused": 108,
+  "finite_response_rows": 18,
+  "geometry_response_rows": 6,
+  "max_alpha_background_fit_relative_rms": 0.0119932153806084,
+  "max_alpha_background_window_relative_change": 0.13683052030449025,
+  "max_metric_background_fit_relative_rms": 0.002904062397830847,
+  "max_metric_background_window_relative_change": 0.004398078035298603,
+  "max_neighbor_renormalization_relative_change": 0.00345127996498255,
+  "max_orbital_response_renormalization_ratio": 1.2799509573845216,
+  "max_xy_hybrid_relative_difference": 1.8203856474374992e-06,
+  "method": "Stage1B state-specific diabatic gaps + Stage2B direct common-orbital CI transition moments + Stage2C polar-transport diagonal backgrounds",
+  "min_orbital_response_renormalization_ratio": 1.2679134614407586,
+  "numerical_pair_failures_after_role_separation": 0,
+  "outputs": {
+    "axis_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/hybrid_axis_response.csv",
+    "geometry_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/B2_final_near_crossing_response.csv",
+    "pair_audit": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs/hybrid_pair_audit.csv"
+  },
+  "paired_field_rows": 54,
+  "scientific_note": "The smooth 1.27-fold transported/direct coupling ratio is retained as a separately reported orbital-response renormalization. It is not used as the physical zero-field transition moment. The exact crossing remains a |F| cusp.",
+  "source_stage2c_protocol_version": "3.0-polar-transport-SA3",
+  "status": "hybrid_response_pass",
+  "warnings": []
+}
+B2 STAGE 2C DIRECT-COUPLING HYBRID AUDIT
+Work directory: /scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2c_addon_runs
+AUDIT PASS: 54 pairs, 18 axis limits, 6 near-crossing geometries
+B2 STAGE 2C ADD-ON PAIR RESCUE COMPLETE

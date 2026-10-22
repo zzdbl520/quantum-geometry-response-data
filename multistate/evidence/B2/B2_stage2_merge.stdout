@@ -1,0 +1,43 @@
+SELF_TEST PASS
+{
+  "combined_geometries": 13,
+  "output": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs",
+  "stage2b_tasks": 26,
+  "stage2c_field_states": 234,
+  "stage2c_pairs": 117,
+  "status": "merge_pass"
+}
+SELF_TEST PASS
+{
+  "analysis_version": "3.2-baseline-aware-direct-mu-hybrid",
+  "axis_response_rows": 39,
+  "explicit_cusp_rows": 2,
+  "field_states_reused": 234,
+  "finite_response_rows": 36,
+  "geometry_response_rows": 13,
+  "max_alpha_background_fit_relative_rms": 0.0119932153806084,
+  "max_alpha_background_window_relative_change": 0.13683052030449025,
+  "max_metric_background_fit_relative_rms": 0.002904062397830847,
+  "max_metric_background_window_relative_change": 0.004398078035298603,
+  "max_neighbor_renormalization_relative_change": 0.0029339184101071537,
+  "max_orbital_response_renormalization_ratio": 1.2837117459858833,
+  "max_xy_hybrid_relative_difference": 2.5994783881938577e-06,
+  "method": "Stage1B state-specific diabatic gaps + Stage2B direct common-orbital CI transition moments + Stage2C polar-transport diagonal backgrounds",
+  "min_orbital_response_renormalization_ratio": 1.2662343369954034,
+  "numerical_pair_failures_after_role_separation": 0,
+  "outputs": {
+    "axis_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs/hybrid_axis_response.csv",
+    "geometry_response": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs/B2_final_near_crossing_response.csv",
+    "pair_audit": "/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs/hybrid_pair_audit.csv"
+  },
+  "paired_field_rows": 117,
+  "scientific_note": "The smooth 1.27-fold transported/direct coupling ratio is retained as a separately reported orbital-response renormalization. It is not used as the physical zero-field transition moment. The exact crossing remains a |F| cusp.",
+  "source_stage2c_protocol_version": "3.0-polar-transport-SA3",
+  "status": "hybrid_response_pass",
+  "warnings": []
+}
+B2 STAGE 2C DIRECT-COUPLING HYBRID AUDIT
+Work directory: /scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs/stage2c_runs
+AUDIT PASS: 117 pairs, 39 axis limits, 13 near-crossing geometries
+B2 13-GEOMETRY MERGE COMPLETE
+/scr/zdb/B2_quantum_geometry/B2_polar_qgeom_package/B2_polar_qgeom_package_v1p9/B2_stage2_combined_runs

@@ -1,0 +1,95 @@
+{
+  "status": "CERTIFIED_COMPONENTWISE",
+  "method": "equal-weight symmetry-complete SA6-CASSCF(8,8)/aug-cc-pVTZ",
+  "transport_status": "PASS",
+  "transport_point_count": 119,
+  "crossings": [
+    {
+      "R_low": 1.652734375,
+      "R_high": 1.6528125,
+      "R_crossing": 1.6527423029936152
+    },
+    {
+      "R_low": 3.0389648438,
+      "R_high": 3.0390625,
+      "R_crossing": 3.0389812911442986
+    }
+  ],
+  "external_delta_pi_crossing": {
+    "R_low": 1.5,
+    "R_high": 1.525,
+    "gap_low_Eh": -0.002037871656412449,
+    "gap_high_Eh": 7.428819876054149e-05,
+    "R_crossing": 1.5241207081393648
+  },
+  "axis_specific_response_audit": {
+    "transverse_x": {
+      "PASS": 53,
+      "non_PASS": 1
+    },
+    "longitudinal_z": {
+      "PASS": 35,
+      "non_PASS": 17
+    },
+    "failed_optimized_longitudinal_pairs_R_2p9_to_3p2": 60,
+    "transverse_rank3_component": {
+      "PASS": 54,
+      "non_PASS": 0
+    },
+    "R_1p55_component_audit": {
+      "R_angstrom": 1.55,
+      "axis": "x",
+      "aggregate_status": "FAIL",
+      "rank3_component_status": "PASS",
+      "all_signed_pairs_pass": true,
+      "target_alpha_spread": 4.216384907906648e-05,
+      "target_alpha_stability": 0.0057754309478855155,
+      "target_metric_spread": 0.00034472868010774804,
+      "target_metric_stability": 0.0001942576889734473,
+      "target_zero_offset_abs_Eh": 3.1814328662660753e-09,
+      "failed_rank3_gates": ""
+    }
+  },
+  "fixed_orbital_diagnostics": [
+    {
+      "R_angstrom": 2.9,
+      "status": "PASS",
+      "diagnosis": "ORBITAL_OPTIMIZATION_BRANCH_BIFURCATION",
+      "minimum_zero_target_sv": 0.9999970955193027,
+      "minimum_plus_minus_target_sv": 0.999988382852736
+    },
+    {
+      "R_angstrom": 3.0390625,
+      "status": "PASS",
+      "diagnosis": "ORBITAL_OPTIMIZATION_BRANCH_BIFURCATION",
+      "minimum_zero_target_sv": 0.9999973587940851,
+      "minimum_plus_minus_target_sv": 0.99998943560287
+    },
+    {
+      "R_angstrom": 3.2,
+      "status": "PASS",
+      "diagnosis": "ORBITAL_OPTIMIZATION_BRANCH_BIFURCATION",
+      "minimum_zero_target_sv": 0.9999975937207729,
+      "minimum_plus_minus_target_sv": 0.999990375005043
+    }
+  ],
+  "plot_policy": [
+    "Only axis-specific PASS rows are joined as relaxed-CASSCF response curves.",
+    "Ground-state response curves do not bridge failed rows or electronic ground-state identity changes.",
+    "Panel-c rows are certified only by gates acting on the plotted rank-three target response and metric; auxiliary rank-six stability is reported separately.",
+    "At R=1.55 Angstrom the plotted rank-three quantities pass every target-specific gate although the aggregate rank-six audit fails.",
+    "The geometry-weighted scale remains connected through the Delta/Pi target-environment crossing and changes sign; the metric is split at that singular P-Q closure.",
+    "The panel-c P-Q closure annotation is black for full-page legibility; the external-crossing guide remains gray to distinguish it from the purple internal crossings.",
+    "Joint-projector geometric curves remain connected through internal X/Delta crossings because both states belong to P.",
+    "Frozen-orbital CASCI values are plotted only as subspace-continuity diagnostics.",
+    "The two fixed-CASCI marker series are displaced horizontally by +/-0.004 Angstrom solely for visibility; their underlying R values are unchanged.",
+    "Bold parenthesized panel labels are placed outside the axes; the panel-c secondary y axis alone owns the right-side ticks and spine.",
+    "No frozen-orbital response value is inserted into relaxed-CASSCF polarizability or geometric-factor curves."
+  ],
+  "outputs": [
+    "/workspace/scratch/3a30ba2a4f3d/tmp/pdfs/c2_black_annotation/C2_certified_multistate_response.pdf",
+    "/workspace/scratch/3a30ba2a4f3d/tmp/pdfs/c2_black_annotation/C2_certified_multistate_response.png",
+    "/workspace/scratch/3a30ba2a4f3d/tmp/pdfs/c2_black_annotation/C2_certified_multistate_response.svg",
+    "/workspace/scratch/3a30ba2a4f3d/tmp/pdfs/c2_black_annotation/C2_certified_audit.csv"
+  ]
+}

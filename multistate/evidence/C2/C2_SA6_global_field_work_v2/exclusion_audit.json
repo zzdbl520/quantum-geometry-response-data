@@ -1,0 +1,37 @@
+{
+  "status": "RECORDED",
+  "manifest": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v2/field_manifest.jsonl",
+  "backup_manifest": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v2/field_manifest.before_exclusions.jsonl",
+  "recorded_utc": "2026-08-28T14:10:59.887742+00:00",
+  "reason": "certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous",
+  "excluded_task_ids": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    800,
+    801,
+    802,
+    803,
+    804,
+    805,
+    806,
+    807
+  ],
+  "excluded_axis_blocks": [
+    {
+      "R_angstrom": 1.0,
+      "axis": "z",
+      "reason": "unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings"
+    },
+    {
+      "R_angstrom": 3.0390625,
+      "axis": "z",
+      "reason": "certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous"
+    }
+  ]
+}

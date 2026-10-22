@@ -1,0 +1,30 @@
+{
+  "status": "PROVISIONAL",
+  "zero_root": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_transport_results_v1",
+  "field_work": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3",
+  "diagnostic_root": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_z_closure_diagnostic_v1",
+  "legacy_spreadsheet_used": false,
+  "transport_point_count": 45,
+  "response_status_counts": {
+    "PASS": 1,
+    "FAIL": 1
+  },
+  "crossings": [
+    {
+      "R_low": 1.65,
+      "R_high": 1.7,
+      "R_crossing": 1.6538282346620945
+    },
+    {
+      "R_low": 3.0,
+      "R_high": 3.05,
+      "R_crossing": 3.0398962968237617
+    }
+  ],
+  "plot_policy": "Only contiguous PASS rows are joined; frozen-orbital diagnostic values are not inserted into relaxed-CASSCF response curves.",
+  "outputs": [
+    "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/figures/C2_global_layout_v1.pdf",
+    "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/figures/C2_global_layout_v1.png",
+    "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/figures/C2_global_layout_v1.svg"
+  ]
+}

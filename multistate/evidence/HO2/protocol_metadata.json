@@ -1,0 +1,39 @@
+{
+  "coordinate_convention": "O-O defines +x; charge center is the origin; off-axis noise is projected out; s=0 at source index 13",
+  "maximum_linearization_displacement_A": 3.048327669731103e-06,
+  "package_version": "1.0.0",
+  "pilot_workdir": "/scr/zdb/HO2_qgeom_pilot_work",
+  "protocols": {
+    "sa4": "equal-weight four-state CASSCF(13,9)",
+    "ss": "state-specific ground-state CASSCF(13,9)"
+  },
+  "reaction": "H + O2 <-> OH + O",
+  "seed_source_index": 13,
+  "selected_source_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "source_dataset_doi": "10.6084/m9.figshare.19601689",
+  "source_file": "/scr/zdb/HO2_quantum_geometry/HO2_qgeom_protocol_validation_v1/data/01_irc.npz",
+  "source_repository": "https://github.com/THGLab/H2COMBUSTION_DATA",
+  "source_sha256": "26084bbb2e7c2542c4413c8803c3fbca885d6be67e42369a11ef96102958e938"
+}

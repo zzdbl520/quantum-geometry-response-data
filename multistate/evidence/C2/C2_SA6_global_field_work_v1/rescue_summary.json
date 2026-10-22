@@ -1,0 +1,197 @@
+{
+  "initial_missing_count": 19,
+  "pass_count": 19,
+  "failure_count": 0,
+  "results": [
+    {
+      "task_id": 705,
+      "status": "PASS",
+      "R_angstrom": 3.025,
+      "axis": "z",
+      "field_au": 5e-05,
+      "restart_task_id": 707,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00705.stdout"
+    },
+    {
+      "task_id": 720,
+      "status": "PASS",
+      "R_angstrom": 3.0375,
+      "axis": "z",
+      "field_au": -5e-05,
+      "restart_task_id": 722,
+      "restart_field_au": -0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00720.stdout"
+    },
+    {
+      "task_id": 721,
+      "status": "PASS",
+      "R_angstrom": 3.0375,
+      "axis": "z",
+      "field_au": 5e-05,
+      "restart_task_id": 723,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00721.stdout"
+    },
+    {
+      "task_id": 725,
+      "status": "PASS",
+      "R_angstrom": 3.0375,
+      "axis": "z",
+      "field_au": 0.00025,
+      "restart_task_id": 723,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00725.stdout"
+    },
+    {
+      "task_id": 737,
+      "status": "PASS",
+      "R_angstrom": 3.03828125,
+      "axis": "z",
+      "field_au": 5e-05,
+      "restart_task_id": 739,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00737.stdout"
+    },
+    {
+      "task_id": 773,
+      "status": "PASS",
+      "R_angstrom": 3.0388671875,
+      "axis": "z",
+      "field_au": 0.00025,
+      "restart_task_id": 771,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00773.stdout"
+    },
+    {
+      "task_id": 787,
+      "status": "PASS",
+      "R_angstrom": 3.0389648438,
+      "axis": "z",
+      "field_au": 0.0001,
+      "restart_task_id": 785,
+      "restart_field_au": 5e-05,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00787.stdout"
+    },
+    {
+      "task_id": 789,
+      "status": "PASS",
+      "R_angstrom": 3.0389648438,
+      "axis": "z",
+      "field_au": 0.00025,
+      "restart_task_id": 787,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00789.stdout"
+    },
+    {
+      "task_id": 791,
+      "status": "PASS",
+      "R_angstrom": 3.0389648438,
+      "axis": "z",
+      "field_au": 0.0005,
+      "restart_task_id": 789,
+      "restart_field_au": 0.00025,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00791.stdout"
+    },
+    {
+      "task_id": 800,
+      "status": "PASS",
+      "R_angstrom": 3.0390625,
+      "axis": "z",
+      "field_au": -5e-05,
+      "restart_task_id": 802,
+      "restart_field_au": -0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00800.stdout"
+    },
+    {
+      "task_id": 803,
+      "status": "PASS",
+      "R_angstrom": 3.0390625,
+      "axis": "z",
+      "field_au": 0.0001,
+      "restart_task_id": 801,
+      "restart_field_au": 5e-05,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00803.stdout"
+    },
+    {
+      "task_id": 804,
+      "status": "PASS",
+      "R_angstrom": 3.0390625,
+      "axis": "z",
+      "field_au": -0.00025,
+      "restart_task_id": 802,
+      "restart_field_au": -0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00804.stdout"
+    },
+    {
+      "task_id": 818,
+      "status": "PASS",
+      "R_angstrom": 3.040625,
+      "axis": "z",
+      "field_au": -0.0001,
+      "restart_task_id": 816,
+      "restart_field_au": -5e-05,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00818.stdout"
+    },
+    {
+      "task_id": 835,
+      "status": "PASS",
+      "R_angstrom": 3.04375,
+      "axis": "z",
+      "field_au": 0.0001,
+      "restart_task_id": 833,
+      "restart_field_au": 5e-05,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00835.stdout"
+    },
+    {
+      "task_id": 836,
+      "status": "PASS",
+      "R_angstrom": 3.04375,
+      "axis": "z",
+      "field_au": -0.00025,
+      "restart_task_id": 834,
+      "restart_field_au": -0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00836.stdout"
+    },
+    {
+      "task_id": 848,
+      "status": "PASS",
+      "R_angstrom": 3.05,
+      "axis": "z",
+      "field_au": -5e-05,
+      "restart_task_id": 850,
+      "restart_field_au": -0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00848.stdout"
+    },
+    {
+      "task_id": 850,
+      "status": "PASS",
+      "R_angstrom": 3.05,
+      "axis": "z",
+      "field_au": -0.0001,
+      "restart_task_id": 852,
+      "restart_field_au": -0.00025,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00850.stdout"
+    },
+    {
+      "task_id": 864,
+      "status": "PASS",
+      "R_angstrom": 3.1,
+      "axis": "z",
+      "field_au": -5e-05,
+      "restart_task_id": 866,
+      "restart_field_au": -0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00864.stdout"
+    },
+    {
+      "task_id": 869,
+      "status": "PASS",
+      "R_angstrom": 3.1,
+      "axis": "z",
+      "field_au": 0.00025,
+      "restart_task_id": 867,
+      "restart_field_au": 0.0001,
+      "log": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v1/rescue_logs/task_00869.stdout"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+category,quantity,value,status,interpretation
+zero_field,transport_points,119/119,PASS,Complete state-tracked SA6 geometry transport from 1.0 to 3.2 Angstrom
+zero_field,first_X_Delta_crossing_R_Angstrom,1.6527423029936152,PASS,Internal crossing within the rank-three X plus Delta target projector
+zero_field,Delta_Pi_external_crossing_R_Angstrom,1.5241207081393648,PHYSICAL_P_Q_CLOSURE,Delta target state crosses Pi environment state; target projector is not spectrally isolated
+zero_field,second_X_Delta_crossing_R_Angstrom,3.0389812911442986,PASS,Internal crossing within the rank-three X plus Delta target projector
+zero_field,maximum_abs_Pdeg_mu_Pdeg_au,2.487507342375331e-14,PASS,No projected linear Stark coupling in either internal X/Delta degenerate manifold
+response,transverse_x_aggregate_limits,53/54,AUXILIARY_RANK6_FAILURE_AT_R_1p55,Aggregate gate combines target and auxiliary rank-six fit stability
+geometry,transverse_rank3_component_limits,54/54,PASS,"Panel-c data are certified by target-only signed-pair, response, metric, and zero-offset gates"
+geometry,R_1p55_aggregate_max_fit_stability,0.14935094483830894,FAIL_AUXILIARY_RANK6,Not applied to panel c because the maximum is contributed by the auxiliary rank-six response matrix
+geometry,R_1p55_target_alpha_fit_stability,0.005775430947885428,PASS,Rank-three response-matrix stability is below the 0.05 gate
+geometry,R_1p55_target_metric_fit_stability,0.00019425768897376683,PASS,Rank-three metric stability is below the 0.05 gate
+geometry,R_1p55_target_zero_offset_abs_Eh,3.1814328662660753e-09,PASS,Rank-three common-frame intercept offset is below 5e-8 Eh
+response,longitudinal_z_zero_field_limits,35/52,PARTIAL_CERTIFICATION,Only PASS rows are used; no interpolation through failures
+response,failed_optimized_longitudinal_pairs,60/60 sampled pairs,DIAGNOSTIC_FAILURE,Optimized CASSCF leaves the target manifold from R=2.9 to 3.2 Angstrom
+response,sampled_alpha_parallel_max_au,44.937128963446845,PASS,Maximum over certified longitudinal samples
+response,sampled_alpha_isotropic_max_au,28.533997169859973,PASS,Maximum where both transverse and longitudinal components pass
+geometry,maximum_certified_Tr_gFF_perpendicular_au,50312.33115343549,PASS,Observed at R=1.50 Angstrom
+geometry,minimum_certified_Delta_geom_perpendicular_eV,-0.03945945124367527,PASS,Observed at R=1.50 Angstrom
+fixed_CASCI,R_2p9_min_zero_target_sv,0.9999970955193027,PASS,Frozen-orbital target manifold remains continuous
+fixed_CASCI,R_2p9_min_plus_minus_target_sv,0.999988382852736,PASS,Frozen-orbital signed-field pair remains continuous
+fixed_CASCI,R_3p0390625_min_zero_target_sv,0.9999973587940851,PASS,Frozen-orbital target manifold remains continuous
+fixed_CASCI,R_3p0390625_min_plus_minus_target_sv,0.99998943560287,PASS,Frozen-orbital signed-field pair remains continuous
+fixed_CASCI,R_3p2_min_zero_target_sv,0.9999975937207729,PASS,Frozen-orbital target manifold remains continuous
+fixed_CASCI,R_3p2_min_plus_minus_target_sv,0.999990375005043,PASS,Frozen-orbital signed-field pair remains continuous
+diagnosis,certified_assignment,ORBITAL_OPTIMIZATION_BRANCH_BIFURCATION,PASS,Optimized-CASSCF failure is not a rank-three CI-manifold discontinuity

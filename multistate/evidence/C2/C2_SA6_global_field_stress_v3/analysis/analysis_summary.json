@@ -1,0 +1,58 @@
+{
+  "status": "REVIEW",
+  "audit_status": "REVIEW",
+  "method": "rank-three polar-transport signed-field response with direction-adapted C2v root blocks",
+  "curvature_fit": "H_even(F)=H_subgroup(0)-A*F^2/2+B*F^4 with a free common-frame intercept",
+  "manifest_task_count": 48,
+  "analyzed_task_count": 40,
+  "excluded_task_count": 8,
+  "excluded_axis_block_count": 1,
+  "pair_count": 20,
+  "limit_count": 5,
+  "global_geometry_count": 2,
+  "excluded_global_geometry_count": 1,
+  "incomplete_global_geometry_count": 0,
+  "failure_counts": {
+    "signed_field_pairs": 4,
+    "zero_field_limits": 1,
+    "xy_symmetry_audits": 0,
+    "global_geometries": 1
+  },
+  "failed_gate_counts": {
+    "signed_field_pairs": {
+      "zero_target_subspace_sv_min": 4,
+      "plus_minus_target_subspace_sv_min": 3
+    },
+    "zero_field_limits": {
+      "all_signed_pairs_pass": 1,
+      "fit_relative_spread_max": 1,
+      "fit_relative_stability_max": 1,
+      "common_frame_zero_offset_abs_Eh_max": 1,
+      "rank6_common_frame_zero_offset_abs_Eh_max": 1
+    },
+    "xy_symmetry_audits": {}
+  },
+  "gates": {
+    "zero_target_subspace_sv_min": 0.98,
+    "plus_minus_target_subspace_sv_min": 0.95,
+    "active_subspace_sv_min": 0.995,
+    "retained_subspace_sv_min": 0.995,
+    "energy_parity_abs_Eh_max": 5e-08,
+    "ensemble_noon_abs_max": 0.1,
+    "spin_square_abs_max": 1e-06,
+    "fit_relative_spread_max": 0.05,
+    "xy_relative_error_max": 0.02,
+    "common_frame_zero_offset_abs_Eh_max": 5e-08
+  },
+  "crossing_interpretation": "Pdeg mu Pdeg is zero: test finite rank-three quadratic response and projector geometry; do not infer a linear Stark cusp from degeneracy alone.",
+  "exclusion_policy": "Only complete signed-field (R,axis) ladders may be excluded. A geometry lacking an explicitly excluded x or z axis is omitted from global isotropic observables without interpolation; all remaining active gates must pass.",
+  "excluded_axis_blocks": [
+    {
+      "R_angstrom": 1.0,
+      "axis": "z",
+      "reason": "unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings"
+    }
+  ],
+  "output_directory": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/analysis",
+  "primary_table": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/analysis/global_response_observables.csv"
+}

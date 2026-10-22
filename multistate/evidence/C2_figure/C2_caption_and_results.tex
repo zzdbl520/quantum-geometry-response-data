@@ -1,0 +1,103 @@
+% Requires \usepackage[version=4]{mhchem}
+
+\paragraph{Figure caption.}
+\textbf{Componentwise-certified multistate response of \ce{C2}.}
+All results were obtained with equal-weight, symmetry-complete
+SA6-CASSCF(8,8)/aug-cc-pVTZ. (a) State-tracked potential-energy curves from
+the 119-point zero-field transport. The purple dashed lines mark the two
+$X\,^1\Sigma_g^+/{}^1\Delta_g$ crossings at $R=1.652742$ and
+$3.038981$~\AA; the gray dotted line at $R=1.524121$~\AA\ marks the
+external $^1\Delta_g/^1\Pi_u$ crossing at which the rank-three target
+projector loses spectral isolation from its environment. (b) Relaxed ground-state transverse
+($\alpha_\perp$), longitudinal ($\alpha_\parallel$), and isotropic
+($\bar\alpha$) polarizabilities. Only axis-specific PASS rows belonging to the
+same zero-field ground-state branch are connected, and $\bar\alpha$ is shown
+only where both components pass. The breaks at the purple guides therefore
+represent switches between one-sided ground-state response branches rather
+than breaks in the joint state manifold. The shaded
+$2.9$--$3.2$~\AA\ interval denotes the sampled longitudinal orbital-branch
+bifurcation region; no longitudinal or isotropic response is interpolated
+through it. (c) Certified transverse rank-three projector metric
+$\operatorname{Tr}g_{FF,\perp}^{(P)}$ and geometry-weighted energy scale
+$\Delta_{\mathrm{geom},\perp}^{(P)}$. Because these quantities belong to the
+joint $X\oplus\Delta_g$ projector, they remain connected through both physical
+internal $X/\Delta_g$ crossings. At the external $\Delta_g/\Pi_u$ closure,
+the blue metric branches are shown only as one-sided data because the
+projector metric is singular in the zero-gap limit, whereas the red
+$\Delta_{\mathrm{geom}}$ scale changes sign continuously through zero.
+The $R=1.55$~\AA\ point is retained: all four signed-field pairs and every
+rank-three response, metric, and common-frame gate pass there. Its aggregate
+rank-six audit failure originates solely from the auxiliary response sector
+and is not propagated to these rank-three observables. The straight red
+segment across the gray guide represents the one-sided limiting trend; no
+finite quadratic-response value is assigned at the exact closure. (d) Minimum target-subspace
+singular values over $|F|=5.0\times10^{-5}$, $1.0\times10^{-4}$,
+$2.5\times10^{-4}$, and $5.0\times10^{-4}$~a.u. for optimized CASSCF and
+fixed-orbital CASCI. The dotted horizontal lines are the $0.98$ zero-to-field
+and $0.95$ signed-pair gates. The optimized longitudinal solutions leave the
+target manifold, whereas fixed-orbital CASCI remains above $0.999988$ at
+$R=2.9$, $3.0390625$, and $3.2$~\AA. Frozen-orbital response values are used
+only for this continuity diagnosis and are not inserted into the relaxed
+response curves. To prevent the nearly identical fixed-CASCI singular values
+from obscuring one another, the star and open-diamond series are displaced
+horizontally by $-0.004$ and $+0.004$~\AA, respectively, solely for display;
+their underlying $R$ values are unchanged.
+
+\paragraph{Results.}
+The zero-field rank-six transport provides a continuous reference manifold
+over all 119 geometries and passes every orbital-, state-, spin-, degeneracy-,
+and polar-unitarity gate. It resolves two genuine
+$X\,^1\Sigma_g^+/{}^1\Delta_g$ crossings at $R=1.652742$ and
+$3.038981$~\AA. At both crossings the projected dipole within the degenerate
+manifold is numerically zero,
+$\max|P_{\mathrm{deg}}\mu P_{\mathrm{deg}}|=2.49\times10^{-14}$~a.u.;
+degeneracy therefore does not by itself generate a linear Stark cusp.
+It also does not require the one-sided quadratic responses of the intersecting
+symmetry branches to be equal. Consequently, the ground-state polarizability
+in panel b is not interpolated across an identity switch, whereas the
+rank-three projector quantities in panel c remain continuous through these
+two internal crossings.
+
+A distinct $^1\Delta_g/^1\Pi_u$ crossing occurs at $R=1.524121$~\AA.
+Here $^1\Delta_g$ belongs to the $P=X\oplus\Delta_g$ target space but
+$^1\Pi_u$ belongs to its complement $Q$, so the $P$--$Q$ energy denominator
+closes. Locally, the dominant two-state terms scale as
+$\operatorname{Tr}g_{FF}^{(P)}\sim |\mu|^2/\delta^2$ and
+$\operatorname{Tr}A^{(P)}\sim2|\mu|^2/\delta$, giving
+$\Delta_{\mathrm{geom}}^{(P)}=\operatorname{Tr}A^{(P)}/
+[2\operatorname{Tr}g_{FF}^{(P)}]\sim\delta$. Thus the metric has a
+singular, cusp-like one-sided enhancement, while the effective geometric
+scale passes continuously through zero as the gap $\delta$ changes sign.
+At the exact closure a symmetry-allowed transverse coupling can instead
+produce a linear Stark cusp, so the quadratic response itself need not be
+defined precisely at that single geometry.
+
+The componentwise field audit reveals a broad maximum of the certified
+longitudinal response, with $\alpha_\parallel=44.937$~a.u. at the sampled
+geometry $R=2.20$~\AA, and a corresponding sampled isotropic maximum of
+$\bar\alpha=28.534$~a.u. at $R=2.25$~\AA. The transverse response remains
+comparatively smooth across the full coordinate. Its rank-three projector
+metric rises from $76.79$~a.u. at $R=1.0$~\AA\ to
+$5.031\times10^{4}$~a.u. at $R=1.50$~\AA, while
+$\Delta_{\mathrm{geom},\perp}^{(P)}$ changes from $-0.03946$~eV at
+$R=1.50$~\AA\ to $+0.07342$~eV at $R=1.55$~\AA. The latter point has
+target-response and target-metric stability measures of $0.00578$ and
+$1.94\times10^{-4}$, respectively, and a common-frame offset of only
+$3.18\times10^{-9}$~$E_h$; all are safely inside their gates. The aggregate
+stability value of $0.14935$ is instead set by the auxiliary rank-six
+response matrix. The large geometric amplification is consequently
+accompanied by a compensating reorganization of the effective spectral scale,
+rather than by a divergence of the physical transverse polarizability.
+
+The second crossing exposes a different phenomenon. All 60 optimized-CASSCF
+longitudinal signed-field pairs at the 15 sampled geometries from
+$R=2.9$ to $3.2$~\AA\ fail at least one target-manifold continuity gate.
+Nevertheless, fixed-orbital CASCI passes all four signed-field pairs at each
+of three diagnostic anchors spanning this interval. Across those anchors,
+the minimum zero-to-field and plus/minus-field singular values are
+$0.9999971$ and $0.9999884$, respectively. The rank-three CI manifold is
+therefore continuous on fixed orbitals, assigning the optimized-CASSCF failure
+to a bifurcation between orbital-stationary branches rather than to loss of
+electronic-state identity. Accordingly, relaxed longitudinal and isotropic
+responses are not reported in this interval, while the independently audited
+transverse response remains certified.

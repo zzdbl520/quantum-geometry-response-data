@@ -1,0 +1,103 @@
+{
+  "status": "PASS",
+  "diagnosis": "ORBITAL_OPTIMIZATION_BRANCH_BIFURCATION",
+  "recommendation": "The rank-three CI manifold is continuous on frozen orbitals. The optimized-CASSCF failure comes from orbital-stationary-branch switching; use a coupled-perturbed/constrained-orbital treatment or report the certified transverse response.",
+  "method": "fixed zero-field SA6-CASSCF orbitals with signed-field CASCI(8,8), direction-adapted C2v root homing",
+  "R_angstrom": 3.2,
+  "zero_h5": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_transport_results_v1/points/R_3p2/point.h5",
+  "target_names": [
+    "X_1Sigma_g+",
+    "Delta_g_x2-y2",
+    "Delta_g_xy"
+  ],
+  "target_solver_indices": [
+    0,
+    1,
+    3
+  ],
+  "field_magnitudes_au": [
+    5e-05,
+    0.0001,
+    0.00025,
+    0.0005
+  ],
+  "zero_reproduction": {
+    "target_subspace_sv_min": 0.9999999999943656,
+    "rank6_subspace_sv_min": 0.999999999989919,
+    "rank6_singular_values": [
+      0.9999999999998118,
+      0.9999999999986932,
+      0.9999999999946284,
+      0.9999999999942614,
+      0.9999999999925929,
+      0.999999999989919
+    ],
+    "status": "PASS"
+  },
+  "pair_count": 4,
+  "pair_failure_count": 0,
+  "minimum_zero_target_sv": 0.9999975937207729,
+  "minimum_plus_minus_target_sv": 0.999990375005043,
+  "fixed_orbital_limit": {
+    "alpha_matrix_F0_au": [
+      [
+        13.29696185440789,
+        -9.063275547896689e-06,
+        -0.0
+      ],
+      [
+        -9.063275547896689e-06,
+        13.463666407042028,
+        -0.0
+      ],
+      [
+        -0.0,
+        -0.0,
+        13.463636610092333
+      ]
+    ],
+    "alpha_eigenvalues_F0_au": [
+      13.296961853915144,
+      13.463636610092333,
+      13.463666407534774
+    ],
+    "alpha_trace_F0_au": 40.224264871542246,
+    "target_projector_metric_trace_F0": 57.11811754368665,
+    "Delta_geom_target_Eh": 0.35211476324282587,
+    "Delta_geom_target_eV": 9.581530825515152,
+    "fit_relative_spread": 4.931899543572436e-08,
+    "fit_relative_stability": 9.592699425605876e-06,
+    "metric_fit_relative_spread": 0.0006900317036185073,
+    "metric_fit_relative_stability": 0.0003892994622396992,
+    "common_frame_zero_offset_abs_max_Eh": 1.3926637620897964e-12,
+    "failed_gates": [],
+    "status": "PASS"
+  },
+  "auxiliary_channels": {
+    "auxiliary_irreps": [
+      "B1u",
+      "Au"
+    ],
+    "requested_roots_per_irrep": 8,
+    "summed_mu_z_squared_by_irrep": {
+      "Au": 1.0668191142348545e-05,
+      "B1u": 0.8543211055936595
+    },
+    "largest_abs_mu_z_au": 0.7981481591107427,
+    "largest_transition": {
+      "channel_irrep": "B1u",
+      "auxiliary_root": 6,
+      "auxiliary_energy_Eh": -75.09656660938752,
+      "target_identity": "Delta_g_x2-y2",
+      "target_solver_order": 1,
+      "target_energy_Eh": -75.40938010279699,
+      "energy_gap_Eh": 0.3128134934094646,
+      "energy_gap_eV": 8.512088792121764,
+      "mu_z_au": 0.7981481591107427,
+      "abs_mu_z_au": 0.7981481591107427,
+      "alpha_diagonal_contribution_au": 4.072973176115508,
+      "metric_diagonal_contribution_au": 6.510226160199704
+    }
+  },
+  "output_directory": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_z_closure_R_3p2"
+}

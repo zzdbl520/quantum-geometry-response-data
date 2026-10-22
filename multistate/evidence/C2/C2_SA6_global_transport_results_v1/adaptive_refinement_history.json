@@ -1,0 +1,9 @@
+[
+  {
+    "iteration": 0,
+    "status": "PASS",
+    "number_of_points": 111,
+    "minimum_state_projector_sv": 0.9832796115290547,
+    "minimum_matched_abs_state_overlap": 0.9769684417725875
+  }
+]

@@ -1,0 +1,10 @@
+check,value,status
+Stage 2C summary,hybrid_response_pass,PASS
+paired signed-field rows,63,PASS
+axis-response rows,21,PASS
+near-crossing geometries,7,PASS
+maximum x/y relative difference,2.599478388e-06,PASS
+crossing R (Angstrom),1.9441854605349,PASS
+left-column crossing alignment fraction,0.396168938123,PASS
+exact cusp left unconnected,true,PASS
+direct and relaxed moments separated,true,PASS

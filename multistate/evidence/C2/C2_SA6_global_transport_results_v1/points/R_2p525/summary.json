@@ -1,0 +1,270 @@
+{
+  "status": "PASS",
+  "R_angstrom": 2.525,
+  "restart": {
+    "restart_h5": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_transport_results_v1/points/R_2p5/point.h5",
+    "restart_R_angstrom": 2.5,
+    "raw_projected_full_MO_metric_error": 0.004152837687874111,
+    "active_rotation_singular_values": [
+      0.9999908306566272,
+      0.9999908306565342,
+      0.9999890663487021,
+      0.99998906634866,
+      0.9999873810407235,
+      0.9999818714540541,
+      0.9998708913456253,
+      0.9998511605013214
+    ],
+    "symmetry_projection": {
+      "construction": "Maximum-overlap D2h projection with fixed valence irrep counts",
+      "orth_error": 6.517009154549669e-14,
+      "core_min_subspace_sv_vs_archived": 0.9979214209105468,
+      "active_min_subspace_sv_vs_archived": 0.9998511605013211,
+      "core_plus_active_min_subspace_sv_vs_archived": 0.9977783442648566,
+      "active_orbital_irreps": [
+        "Ag",
+        "Ag",
+        "B2g",
+        "B3g",
+        "B1u",
+        "B1u",
+        "B2u",
+        "B3u"
+      ],
+      "projection_by_irrep": {
+        "Ag": {
+          "core_count": 1,
+          "active_count": 2,
+          "core_projection_singular_values": [
+            0.9979214209105471
+          ],
+          "active_projection_singular_values": [
+            0.9999873810407239,
+            0.9998708913456251
+          ]
+        },
+        "B1g": {
+          "core_count": 0,
+          "active_count": 0,
+          "core_projection_singular_values": [],
+          "active_projection_singular_values": []
+        },
+        "B2g": {
+          "core_count": 0,
+          "active_count": 1,
+          "core_projection_singular_values": [],
+          "active_projection_singular_values": [
+            0.99998906634866
+          ]
+        },
+        "B3g": {
+          "core_count": 0,
+          "active_count": 1,
+          "core_projection_singular_values": [],
+          "active_projection_singular_values": [
+            0.999989066348702
+          ]
+        },
+        "Au": {
+          "core_count": 0,
+          "active_count": 0,
+          "core_projection_singular_values": [],
+          "active_projection_singular_values": []
+        },
+        "B1u": {
+          "core_count": 1,
+          "active_count": 2,
+          "core_projection_singular_values": [
+            0.9979233307253371
+          ],
+          "active_projection_singular_values": [
+            0.9999818714540541,
+            0.9998511605013181
+          ]
+        },
+        "B2u": {
+          "core_count": 0,
+          "active_count": 1,
+          "core_projection_singular_values": [],
+          "active_projection_singular_values": [
+            0.9999908306565339
+          ]
+        },
+        "B3u": {
+          "core_count": 0,
+          "active_count": 1,
+          "core_projection_singular_values": [],
+          "active_projection_singular_values": [
+            0.9999908306566269
+          ]
+        }
+      }
+    }
+  },
+  "method": "equal-weight symmetry-complete SA6-CASSCF(8,8)/aug-cc-pVTZ",
+  "optimizer": "staged trust-region first-order/Newton",
+  "optimizer_stages": [
+    {
+      "name": "settle",
+      "converged": true,
+      "wall_seconds": 12.394767761230469,
+      "best_gradient": 8.592250857926203e-06,
+      "best_energy_Eh": -75.4148664969202,
+      "best_macro_iteration": 4,
+      "continuation_frame_source": "converged_final_frame"
+    },
+    {
+      "name": "damped_newton",
+      "converged": true,
+      "wall_seconds": 3.8042473793029785,
+      "best_gradient": 8.616476062288196e-07,
+      "best_energy_Eh": -75.41486649698584,
+      "best_macro_iteration": 2,
+      "continuation_frame_source": "converged_final_frame"
+    }
+  ],
+  "casscf_converged": true,
+  "average_energy_Eh": -75.41486649698584,
+  "states": [
+    {
+      "solver_order": 0,
+      "irrep": "Ag",
+      "irrep_root": 0,
+      "energy_Eh": -75.41962851100268,
+      "relative_energy_mEh": 0.0,
+      "global_energy_rank": 1,
+      "spin_square": 6.4936061832002615e-12,
+      "multiplicity": 1.0000000000129872,
+      "local_assignment": "B 1Delta_g (x2-y2 component) candidate"
+    },
+    {
+      "solver_order": 1,
+      "irrep": "Ag",
+      "irrep_root": 1,
+      "energy_Eh": -75.41867232951539,
+      "relative_energy_mEh": 0.9561814872967034,
+      "global_energy_rank": 3,
+      "spin_square": 3.143080694042296e-11,
+      "multiplicity": 1.0000000000628615,
+      "local_assignment": "X 1Sigma_g+ candidate"
+    },
+    {
+      "solver_order": 2,
+      "irrep": "Ag",
+      "irrep_root": 2,
+      "energy_Eh": -75.40935025287303,
+      "relative_energy_mEh": 10.278258129659434,
+      "global_energy_rank": 6,
+      "spin_square": 2.6461598031549767e-09,
+      "multiplicity": 1.0000000052923195,
+      "local_assignment": "B' 1Sigma_g+ candidate"
+    },
+    {
+      "solver_order": 3,
+      "irrep": "B1g",
+      "irrep_root": 0,
+      "energy_Eh": -75.41962851096226,
+      "relative_energy_mEh": 4.04298816647497e-08,
+      "global_energy_rank": 2,
+      "spin_square": 1.208971867568965e-10,
+      "multiplicity": 1.0000000002417944,
+      "local_assignment": "B 1Delta_g (xy component) candidate"
+    },
+    {
+      "solver_order": 4,
+      "irrep": "B2u",
+      "irrep_root": 0,
+      "energy_Eh": -75.4109596888574,
+      "relative_energy_mEh": 8.668822145281752,
+      "global_energy_rank": 4,
+      "spin_square": 7.676610742294793e-11,
+      "multiplicity": 1.000000000153532,
+      "local_assignment": "A 1Pi_u (y component) candidate"
+    },
+    {
+      "solver_order": 5,
+      "irrep": "B3u",
+      "irrep_root": 0,
+      "energy_Eh": -75.4109596887043,
+      "relative_energy_mEh": 8.6688222983895,
+      "global_energy_rank": 5,
+      "spin_square": 9.171872857902375e-11,
+      "multiplicity": 1.0000000001834375,
+      "local_assignment": "A 1Pi_u (x component) candidate"
+    }
+  ],
+  "degeneracy_diagnostics": {
+    "Pi_u_component_split_Eh": 1.531077487015864e-10,
+    "Delta_g_component_split_Eh": 4.04298816647497e-11,
+    "Delta_g_Ag_root": 0
+  },
+  "final_mo_orthogonality_error": 5.007105841059456e-14,
+  "final_active_orbital_irreps": [
+    "Ag",
+    "Ag",
+    "B2g",
+    "B3g",
+    "B1u",
+    "B1u",
+    "B2u",
+    "B3u"
+  ],
+  "active_subspace_singular_values_vs_projected_restart": [
+    0.9998970816201035,
+    0.9998878544075759,
+    0.9998661484957776,
+    0.9998661484188307,
+    0.9998565645771192,
+    0.9998565645019798,
+    0.9996468618336977,
+    0.9995497000653725
+  ],
+  "retained_subspace_singular_values_vs_projected_restart": [
+    0.9999998051029904,
+    0.9999993759841312,
+    0.9998661484957777,
+    0.9998661484188305,
+    0.9998565645771195,
+    0.9998565645019796,
+    0.9997933720644027,
+    0.999765926757333,
+    0.9991879974943507,
+    0.9991302243092788
+  ],
+  "mu_P_eigenvalues_au": {
+    "x": [
+      -0.07972178446039538,
+      -0.046053056103543294,
+      -1.4233669690022196e-17,
+      1.0863670542442424e-17,
+      0.046053056103543294,
+      0.07972178446039536
+    ],
+    "y": [
+      -0.07972179839460193,
+      -0.04605306705257379,
+      -4.5244687547322336e-18,
+      0.0,
+      0.04605306705257379,
+      0.07972179839460197
+    ],
+    "z": [
+      -1.1635519279275387e-14,
+      -9.277792426295742e-15,
+      2.372404460209337e-16,
+      2.601732426030554e-15,
+      8.977447893787058e-15,
+      8.996257248279488e-15
+    ]
+  },
+  "wall_seconds": 16.199015140533447,
+  "gate": {
+    "casscf_converged": true,
+    "final_mo_orth_error_le_1e-8": true,
+    "all_states_singlet_abs_S2_le_1e-6": true,
+    "Pi_u_split_le_1e-7_Eh": true,
+    "Delta_g_split_le_1e-7_Eh": true,
+    "active_min_sv_vs_projected_restart_ge_0p995": true,
+    "retained_min_sv_vs_projected_restart_ge_0p995": true
+  }
+}

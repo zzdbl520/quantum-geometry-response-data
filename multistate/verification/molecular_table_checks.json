@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "scope": "Checks of distributed records; no new wavefunctions or overlap reconstruction.",
+  "C2": {
+    "points": 119,
+    "edges": 118,
+    "internal_crossings_A": [
+      1.6527423029936152,
+      3.0389812911442986
+    ],
+    "external_crossing_A": [
+      1.5241207081393648
+    ],
+    "minimum_singular_values": {
+      "minimum_active_subspace_sv": 0.999316904795259,
+      "minimum_retained_subspace_sv": 0.9969356168580756,
+      "minimum_state_projector_sv": 0.9832796115290549,
+      "minimum_matched_abs_state_overlap": 0.9769684417725876
+    },
+    "max_projected_dipole_au": 2.4875073423753313e-14
+  },
+  "B2": {
+    "geometries": 13,
+    "signed_states": 234,
+    "pairs": 117,
+    "axis_rows": 39,
+    "crossing_A": 1.9441854605348607,
+    "direct_coupling_au": 0.1974399069446437,
+    "aligned_derivative_magnitude_au": 0.251331954757938,
+    "ratio_range": [
+      1.2662343369954034,
+      1.2837117459858831
+    ],
+    "original_pair_status_counts": {
+      "AMBIGUOUS": 78,
+      "PASS": 39
+    },
+    "hybrid_pair_status_counts": {
+      "PASS": 117
+    }
+  },
+  "HO2": {
+    "pairs": 56,
+    "geometries": 14,
+    "internal_formula_max_error": 1.4210854715202004e-14,
+    "min_field_anchor_sv": 0.9992803333711788,
+    "peak_checks": [
+      {
+        "source_index": 5,
+        "median": 27.752446078113927,
+        "lower": 27.649230767386864,
+        "upper": 27.79711719554728,
+        "margin": 4.6795320634959445
+      },
+      {
+        "source_index": 9,
+        "median": 24.863862923197217,
+        "lower": 24.772464988957744,
+        "upper": 25.268333855179225,
+        "margin": 0.21165369577206405
+      }
+    ],
+    "full_matrix_failure_count": 12,
+    "operator_extrapolation_gate": false,
+    "global_scalar_range_gate": false
+  }
+}

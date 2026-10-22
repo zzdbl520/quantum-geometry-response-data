@@ -1,0 +1,65 @@
+{
+  "status": "REVIEW",
+  "audit_status": "REVIEW",
+  "method": "rank-three polar-transport signed-field response with direction-adapted C2v root blocks",
+  "curvature_fit": "H_even(F)=H_subgroup(0)-A*F^2/2+B*F^4 with a free common-frame intercept",
+  "manifest_task_count": 904,
+  "analyzed_task_count": 888,
+  "excluded_task_count": 16,
+  "excluded_axis_block_count": 2,
+  "pair_count": 444,
+  "limit_count": 111,
+  "global_geometry_count": 52,
+  "excluded_global_geometry_count": 2,
+  "incomplete_global_geometry_count": 0,
+  "failure_counts": {
+    "signed_field_pairs": 60,
+    "zero_field_limits": 18,
+    "xy_symmetry_audits": 0,
+    "global_geometries": 18
+  },
+  "failed_gate_counts": {
+    "signed_field_pairs": {
+      "zero_target_subspace_sv_min": 60,
+      "energy_parity_abs_Eh_max": 7,
+      "plus_minus_target_subspace_sv_min": 41,
+      "ensemble_noon_abs_max": 1
+    },
+    "zero_field_limits": {
+      "rank6_common_frame_zero_offset_abs_Eh_max": 16,
+      "fit_relative_stability_max": 17,
+      "all_signed_pairs_pass": 15,
+      "fit_relative_spread_max": 15,
+      "common_frame_zero_offset_abs_Eh_max": 15
+    },
+    "xy_symmetry_audits": {}
+  },
+  "gates": {
+    "zero_target_subspace_sv_min": 0.98,
+    "plus_minus_target_subspace_sv_min": 0.95,
+    "active_subspace_sv_min": 0.995,
+    "retained_subspace_sv_min": 0.995,
+    "energy_parity_abs_Eh_max": 5e-08,
+    "ensemble_noon_abs_max": 0.1,
+    "spin_square_abs_max": 1e-06,
+    "fit_relative_spread_max": 0.05,
+    "xy_relative_error_max": 0.02,
+    "common_frame_zero_offset_abs_Eh_max": 5e-08
+  },
+  "crossing_interpretation": "Pdeg mu Pdeg is zero: test finite rank-three quadratic response and projector geometry; do not infer a linear Stark cusp from degeneracy alone.",
+  "exclusion_policy": "Only complete signed-field (R,axis) ladders may be excluded. A geometry lacking an explicitly excluded x or z axis is omitted from global isotropic observables without interpolation; all remaining active gates must pass.",
+  "excluded_axis_blocks": [
+    {
+      "R_angstrom": 1.0,
+      "axis": "z",
+      "reason": "unresolved longitudinal orbital branch at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both crossings"
+    },
+    {
+      "R_angstrom": 3.0390625,
+      "axis": "z",
+      "reason": "certified longitudinal orbital-stationary-branch bifurcation at the second X/Delta crossing; frozen-orbital CASCI manifold remains continuous"
+    }
+  ],
+  "output_directory": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v2/analysis",
+  "primary_table": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_work_v2/analysis/global_response_observables.csv"
+}

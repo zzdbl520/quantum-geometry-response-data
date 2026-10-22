@@ -4,6 +4,15 @@ This repository contains derived response data for H2, N2, Cr2, F2, OsO4,
 and the ligand-supported dicopper–dioxygen complex. It accompanies the article
 and Supporting Information (SI) of the same title.
 
+## Related multistate study
+
+The [multistate directory](multistate/) contains the separate C2, B2, and
+H + O2 / OH + O study, *Multistate Quantum Geometry Distinguishes Physical
+Response from Electronic-State Switching*, revised on 22 October 2026.
+It includes Supplementary Material, numerical records, figure scripts,
+and verification reports. The single-state materials below retain their
+existing locations.
+
 ## Contents
 
 - [`data/`](data/): all 69 numerical data and audit files from the verified
@@ -51,3 +60,4 @@ checks the derived numerical results and regenerates analysis figures into
 `generated/`. The original electronic-structure wavefunction checkpoints,
 integral files, and scratch data are not distributed, so the archive does not
 recompute every first-principles wavefunction from the beginning.
+

@@ -1,0 +1,24 @@
+{
+  "status": "RECORDED",
+  "manifest": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/field_manifest.jsonl",
+  "backup_manifest": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_global_field_stress_v3/field_manifest.before_exclusions.jsonl",
+  "recorded_utc": "2026-08-28T12:45:31.583688+00:00",
+  "reason": "unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings",
+  "excluded_task_ids": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "excluded_axis_blocks": [
+    {
+      "R_angstrom": 1.0,
+      "axis": "z",
+      "reason": "unresolved A1-branch instability at the strongly compressed endpoint R=1.0 Angstrom; nonessential to both X/Delta crossings"
+    }
+  ]
+}

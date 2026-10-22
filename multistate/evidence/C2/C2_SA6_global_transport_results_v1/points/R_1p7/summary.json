@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "R_angstrom": 1.7,
+  "kind": "immutable_certified_local_center_seed",
+  "certification": "source local production_summary and rank-six transport_summary are PASS",
+  "source_point_directory": "/mnt/C2_quantum_geometry/C2_SA4_pilot/C2_SA6_local_transport_results_v1/points/R_1p700000"
+}

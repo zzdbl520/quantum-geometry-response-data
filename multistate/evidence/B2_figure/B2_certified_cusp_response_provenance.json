@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "figure": {
+    "pdf": "/workspace/scratch/3a30ba2a4f3d/B2_work/final_deliverables/B2_certified_cusp_response.pdf",
+    "png": "/workspace/scratch/3a30ba2a4f3d/B2_work/final_deliverables/B2_certified_cusp_response.png",
+    "svg": "/workspace/scratch/3a30ba2a4f3d/B2_work/final_deliverables/B2_certified_cusp_response.svg"
+  },
+  "source_files": {
+    "stage2c_summary": "/workspace/scratch/3a30ba2a4f3d/B2_work/raw_stage2c/B2_stage2c_runs/B2_stage2c_hybrid_summary.json",
+    "geometry_response": "/workspace/scratch/3a30ba2a4f3d/B2_work/raw_stage2c/B2_stage2c_runs/B2_final_near_crossing_response.csv",
+    "axis_response": "/workspace/scratch/3a30ba2a4f3d/B2_work/raw_stage2c/B2_stage2c_runs/hybrid_axis_response.csv",
+    "pair_audit": "/workspace/scratch/3a30ba2a4f3d/B2_work/raw_stage2c/B2_stage2c_runs/hybrid_pair_audit.csv",
+    "stage1b_branch_map": "/workspace/scratch/3a30ba2a4f3d/B2_work/stage1b/B2_stage1b_runs/B2_symmetry_branch_map.csv"
+  },
+  "certification": {
+    "status": "PASS",
+    "counts": {
+      "geometry_response_rows": 7,
+      "axis_response_rows": 21,
+      "paired_field_rows": 63
+    },
+    "maximum_xy_relative_difference": 2.5994783881938577e-06,
+    "crossing_R_Angstrom": 1.9441854605348607,
+    "mu_direct_perpendicular_au": 0.1974399069446437,
+    "mu_relaxed_transport_perpendicular_au": 0.251331954757938
+  },
+  "reported_quantities": {
+    "crossing_R_Angstrom": 1.9441854605348607,
+    "mu_direct_perpendicular_au": 0.1974399069446437,
+    "mu_relaxed_transport_perpendicular_au": 0.251331954757938,
+    "cusp_slope_direct_perpendicular_au": 0.19743990694464297,
+    "relaxation_ratio_range": [
+      1.2662343369954034,
+      1.2837117459858833
+    ],
+    "alpha_parallel_range_au": [
+      61.11909516736477,
+      70.89368739095899
+    ],
+    "metric_parallel_range_au": [
+      135.97152082165735,
+      207.59107684279516
+    ]
+  },
+  "plotting_policy": {
+    "exact_crossing_response": "left as a cusp; no finite alpha or metric value plotted",
+    "direct_vs_relaxed": "shown separately; relaxed/direct ratio is diagnostic only",
+    "line_bridging_across_crossing": false,
+    "minor_ticks": false,
+    "left_column_crossing_axis_fraction": 0.39616893812251414
+  }
+}
