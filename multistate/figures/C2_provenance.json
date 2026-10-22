@@ -74,6 +74,7 @@
     }
   ],
   "plot_policy": [
+    "The current figure describes an orbital-continuity failure; historical diagnosis codes are preserved as source metadata.",
     "Only axis-specific PASS rows are joined as relaxed-CASSCF response curves.",
     "Ground-state response curves do not bridge failed rows or electronic ground-state identity changes.",
     "Panel-c rows are certified only by gates acting on the plotted rank-three target response and metric; auxiliary rank-six stability is reported separately.",

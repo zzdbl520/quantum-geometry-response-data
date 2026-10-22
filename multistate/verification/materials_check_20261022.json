@@ -1,0 +1,21 @@
+{
+  "revision_date": "2026-10-22",
+  "original_evidence_files": 840,
+  "original_evidence_byte_preservation": "PASS",
+  "theory_verification": "PASS",
+  "molecular_table_verification": "PASS",
+  "current_figure_pdf_structure": "PASS: one page and complete PDF trailer for every figure",
+  "si_pages": 13,
+  "si_sections": "S1-S8",
+  "si_equations": "S1-S29",
+  "si_undefined_citations_or_references": 0,
+  "si_overfull_boxes": 0,
+  "changes": [
+    "Use a current C2 plotting script with orbital-continuity failure terminology; preserve the original evidence script.",
+    "Retain current 13-geometry B2 and aligned-background reaction figures.",
+    "Write derived PDF/PNG plots through temporary files before replacement; reject incomplete PDFs.",
+    "Correct SI offset-fit grammar and bibliography name parsing.",
+    "Rebuild SI, check PDF links, and refresh file hashes."
+  ],
+  "scope": "Distributed-table analyses, figure regeneration, and finite-dimensional theory checks; not every original CASSCF optimization."
+}

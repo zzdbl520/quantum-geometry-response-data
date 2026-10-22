@@ -18,7 +18,7 @@ run(R/'scripts/verify_revision.py')
 run(R/'scripts/verify_molecular_tables.py')
 run(R/'scripts/make_figures.py')
 c = R/'evidence/C2'
-run(R/'evidence/C2_figure/plot_c2_certified_final.py',
+run(R/'scripts/plot_c2_current.py',
     '--zero-root',c/'C2_SA6_global_transport_results_v1',
     '--field-work',c/'C2_SA6_global_field_work_v2',
     '--diagnostic-roots',c/'C2_SA6_z_closure_R_2p9',

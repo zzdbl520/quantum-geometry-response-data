@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate vector diagrams and plots from the supplied numerical tables."""
 from pathlib import Path
+from io import BytesIO
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -13,7 +14,16 @@ plt.rcParams.update({"font.family":"DejaVu Sans","font.size":9,"axes.labelsize":
  "axes.spines.top":False,"axes.spines.right":False,"savefig.facecolor":"white"})
 blue="#28699A";red="#B64A48";green="#337E62";purple="#715598";orange="#B67725"
 def save(fig,name):
-    for ext in ["pdf","png"]:fig.savefig(O/(name+"."+ext),dpi=200,bbox_inches="tight")
+    for ext in ["pdf","png"]:
+        target = O/(name+"."+ext)
+        temporary = target.with_name(target.name+".tmp")
+        buffer = BytesIO()
+        fig.savefig(buffer,format=ext,dpi=200,bbox_inches="tight")
+        data = buffer.getvalue()
+        if ext == "pdf" and not data.rstrip().endswith(b"%%EOF"):
+            raise RuntimeError(f"Incomplete PDF output: {target}")
+        temporary.write_bytes(data)
+        temporary.replace(target)
     plt.close(fig)
 def panel(ax,s):ax.text(-.12,1.04,s,transform=ax.transAxes,fontweight="bold")
 fig,ax=plt.subplots(figsize=(7.2,2.7));ax.set(xlim=(0,10),ylim=(0,4));ax.axis("off")
