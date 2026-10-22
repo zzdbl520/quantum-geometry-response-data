@@ -84,3 +84,16 @@ aligned-background, internal-mixing, and total-median labels. The archived
 `figures/scheme.*` is a historical sketch, not the manuscript's Figure 1.
 The manuscript source package contains a separately redrawn vector Figure 1
 that states the exact-degeneracy and spectral-isolation conditions explicitly.
+
+## Final style and SI-reference check
+
+The final presentation follows the author's original figure style: closed black
+axes, inward ticks, open markers, and the original component colours. B2 retains
+the current 13-geometry dataset, with a linear polarizability axis and a logarithmic
+metric axis. The reaction decomposition uses the original dual-axis arrangement;
+the caption assigns the background and total to the left axis and internal mixing
+to the right axis. Data values and numerical gates are unchanged.
+
+The main-text callouts to all SI sections, tables, and the control figure are
+listed in [the reference map](SI_CROSS_REFERENCES.md). The SI labels for Tables S1
+and S2 and Figure S1 are verified after compilation.

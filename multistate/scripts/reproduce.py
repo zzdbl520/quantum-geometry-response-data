@@ -39,7 +39,7 @@ entries = [
 table = r'''\begin{table}[ht]
 \caption{Finite-dimensional checks rerun for this release. Errors are relative
 Frobenius errors unless indicated otherwise. The metric entry compares scalar
-traces. Values can vary slightly with the numerical libraries.}
+traces. Values can vary slightly with the numerical libraries.}\label{tab:verification}
 \begin{ruledtabular}\begin{tabular}{lr}
 Check & Error\\
 '''+''.join(f'{a} & {num(b)}'+r'\\'+'\n' for a,b in entries)+r'''

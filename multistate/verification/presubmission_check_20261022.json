@@ -1,0 +1,144 @@
+{
+  "baseline_commit": "c317766c88fdc9486249483cb65875aa508c26af",
+  "main_pages": 11,
+  "si_pages": 13,
+  "cross_reference_coverage": [
+    {
+      "si_item": "Sec. S1",
+      "subject": "Resolvent expansion and validity",
+      "main_section": "II C",
+      "main_pages": [
+        3
+      ]
+    },
+    {
+      "si_item": "Sec. S2",
+      "subject": "Supported factorization and generalized eigenvalues",
+      "main_section": "II E",
+      "main_pages": [
+        4
+      ]
+    },
+    {
+      "si_item": "Sec. S3",
+      "subject": "Projector derivative, canonical response, finite width",
+      "main_section": "II D",
+      "main_pages": [
+        4
+      ]
+    },
+    {
+      "si_item": "Sec. S4",
+      "subject": "Overlap estimators and offset fit",
+      "main_section": "III A",
+      "main_pages": [
+        5
+      ]
+    },
+    {
+      "si_item": "Sec. S5",
+      "subject": "Branch reconstruction and cusp",
+      "main_section": "III A",
+      "main_pages": [
+        5
+      ]
+    },
+    {
+      "si_item": "Sec. S6",
+      "subject": "Computational details (via S6.1-S6.5)",
+      "main_section": "III B; IV C",
+      "main_pages": [
+        5,
+        6,
+        8,
+        9
+      ]
+    },
+    {
+      "si_item": "Sec. S6.1",
+      "subject": "C2 criteria and fixed-orbital controls",
+      "main_section": "III B",
+      "main_pages": [
+        5
+      ]
+    },
+    {
+      "si_item": "Sec. S6.2",
+      "subject": "B2 hybrid inputs and acceptance criteria",
+      "main_section": "III B",
+      "main_pages": [
+        6
+      ]
+    },
+    {
+      "si_item": "Sec. S6.3",
+      "subject": "Reaction state selection",
+      "main_section": "III B",
+      "main_pages": [
+        6
+      ]
+    },
+    {
+      "si_item": "Sec. S6.4",
+      "subject": "Reaction field envelopes and local peaks",
+      "main_section": "IV C",
+      "main_pages": [
+        9
+      ]
+    },
+    {
+      "si_item": "Sec. S6.5",
+      "subject": "Historical column names and current notation",
+      "main_section": "IV C",
+      "main_pages": [
+        8
+      ]
+    },
+    {
+      "si_item": "Sec. S7",
+      "subject": "Independent theoretical and data checks",
+      "main_section": "III A",
+      "main_pages": [
+        5
+      ]
+    },
+    {
+      "si_item": "Sec. S8",
+      "subject": "Data organization and reproducibility scope",
+      "main_section": "Data Availability",
+      "main_pages": [
+        9
+      ]
+    },
+    {
+      "si_item": "Table S1",
+      "subject": "Numerical checks of both local maxima",
+      "main_section": "IV C",
+      "main_pages": [
+        9
+      ]
+    },
+    {
+      "si_item": "Table S2",
+      "subject": "Finite-dimensional verification results",
+      "main_section": "III A",
+      "main_pages": [
+        5
+      ]
+    },
+    {
+      "si_item": "Fig. S1",
+      "subject": "Later reaction controls, including index 18",
+      "main_section": "IV C",
+      "main_pages": [
+        8
+      ]
+    }
+  ],
+  "coverage_status": "PASS: all eight sections, all five computational subsections, both tables, and Figure S1",
+  "original_evidence_files_unchanged": 840,
+  "unresolved_citations_and_references": 0,
+  "style_reference": "Author-supplied JCP_submission-2.pdf",
+  "style_changes": "Original two-panel schematic; closed black axes, inward ticks, original colours and open markers; linear B2 polarizability and logarithmic metric; dual-axis reaction decomposition.",
+  "data_status": "The current 13-geometry B2 dataset, reaction medians/ranges, and C2 records are unchanged."
+}

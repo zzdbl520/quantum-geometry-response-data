@@ -41,53 +41,101 @@ save(fig,"scheme")
 if "--scheme-only" in __import__("sys").argv:
     print("Updated operator notation in scheme.")
     raise SystemExit(0)
+
+# Match the author's original publication figures: closed black axes,
+# inward ticks, open markers, and the original component colours.
+plt.rcParams.update({
+    "font.family":"sans-serif", "font.sans-serif":["Arial","DejaVu Sans"],
+    "mathtext.fontset":"stixsans", "font.size":8.6, "axes.labelsize":9.5,
+    "axes.linewidth":1.0, "axes.edgecolor":"black", "text.color":"black",
+    "axes.spines.top":True, "axes.spines.right":True,
+    "xtick.direction":"in", "ytick.direction":"in",
+    "xtick.major.size":4.2, "ytick.major.size":4.2,
+    "xtick.major.width":.9, "ytick.major.width":.9,
+    "legend.fontsize":7.5, "legend.frameon":False})
+black="#171717";blue="#3976BA";red="#C74440";teal="#2A9186"
+orange="#D58A17";purple="#7B61A8"
+def style(ax,label=None,right=True):
+    for spine in ax.spines.values():
+        spine.set_visible(True);spine.set_color("black");spine.set_linewidth(1.)
+    ax.tick_params(which="major",top=True,right=right,direction="in",colors="black")
+    ax.minorticks_off()
+    if label:ax.text(-.08,1.025,label,transform=ax.transAxes,ha="left",va="bottom",
+                     fontsize=10.2,fontweight="bold",clip_on=False)
+
 b=pd.read_csv(R/"evidence/B2/B2_stage2_combined_runs/stage2c_runs/B2_final_near_crossing_response.csv")
 b=b.sort_values("R_Angstrom");x=b.R_Angstrom.to_numpy();rc=1.9441854605348607
-fig,axs=plt.subplots(2,2,figsize=(7.1,5.3),layout="constrained")
-a=axs[0,0];a.plot(x,1000*b.stage1b_X_minus_A_gap_Eh,"o-",color=blue,ms=3);a.axhline(0,color=".6",lw=.7);a.set_ylabel(r"$E_X-E_A$ (m$E_{\rm h}$)");panel(a,"(a)")
-a=axs[0,1];a.plot(x,b.mu_direct_perpendicular_au,"o-",color=blue,ms=3,label="Direct dipole")
-a.plot(x,b.mu_relaxed_transport_perpendicular_au,"s-",color=orange,ms=3,label="Aligned SA3 derivative")
-a.set_ylabel("Magnitude (a.u.)");a.legend(loc="best");panel(a,"(b)")
-for a,kind,lab,p in [(axs[1,0],"alpha",r"$\alpha_{\rm hyb}$ (a.u.)","(c)"),(axs[1,1],"metric",r"$g_{\rm hyb}$ (a.u.)","(d)")]:
-    for suffix,name,c in [("x","Transverse",blue),("z","Longitudinal",orange)]:
+fig,axs=plt.subplots(2,2,figsize=(7.35,6.05),layout="constrained")
+a=axs[0,0]
+a.plot(x,1000*b.stage1b_X_minus_A_gap_Eh,"o-",color=black,ms=3.8,mfc="white",lw=1.5)
+a.axhline(0,color=".65",lw=.7)
+a.set_ylabel(r"$E_X-E_A$ (m$E_{\rm h}$)")
+a.text(.49,.08,r"$R_c\simeq1.944$ $\AA$",transform=a.transAxes,fontsize=8)
+a=axs[0,1]
+a.plot(x,b.mu_direct_perpendicular_au,"o-",color=black,ms=3.8,lw=1.5,label="Direct dipole")
+a.plot(x,b.mu_relaxed_transport_perpendicular_au,"s-",color=teal,mfc="white",ms=3.8,lw=1.5,label="Aligned SA3 derivative")
+a.set_ylabel("Transition magnitude (a.u.)");a.legend(loc="best",handlelength=2.)
+for a,kind,lab in [(axs[1,0],"alpha",r"Hybrid polarizability, $\alpha_{\rm hyb}$ (a.u.)"),
+                   (axs[1,1],"metric",r"Hybrid metric, $g_{\rm hyb}$ (a.u.)")]:
+    for suffix,name,c,marker,ls,mfc in [("x",r"$\alpha_\perp$" if kind=="alpha" else r"$g_\perp$",blue,"o","-",blue),
+                                     ("z",r"$\alpha_\parallel$" if kind=="alpha" else r"$g_\parallel$",orange,"s","--","white")]:
         y=pd.to_numeric(b[f"{kind}_{suffix}_final_au"],errors="coerce").to_numpy()
         for k,sel in enumerate([x<rc-1e-8,x>rc+1e-8]):
-            a.plot(x[sel],y[sel],"o-",color=c,ms=3,label=name if k==0 else None)
-    a.set(yscale="log",ylabel=lab);a.legend();panel(a,p)
-for a in axs.ravel():
-    a.axvline(rc,color=purple,ls="--",lw=.8);a.set_xlabel(r"$R$ ($\AA$)");a.tick_params(direction="in")
+            a.plot(x[sel],y[sel],color=c,marker=marker,ls=ls,mfc=mfc,ms=3.8,lw=1.5,label=name if k==0 else None)
+    a.set_ylabel(lab);a.legend(loc="upper left",handlelength=2.)
+    if kind=="metric":a.set_yscale("log")
+    else:a.set_ylim(bottom=0)
+for i,a in enumerate(axs.ravel()):
+    a.axvline(rc,color=purple,ls=(0,(3.,2.3)),lw=1.1,zorder=0)
+    style(a,f"({chr(97+i)})")
+    if i<2:a.tick_params(labelbottom=False)
+    else:a.set_xlabel(r"B--B distance, $R$ ($\AA$)")
 save(fig,"B2")
+
 s=pd.read_csv(R/"evidence/HO2/manifold_summary.csv").sort_values("source_index")
 def reaction(early,name,controls=False):
     x=early.source_index.to_numpy()/57
     y=early.plateau_reconstructed_ground_alpha_median_au.to_numpy()
     lo=early.plateau_reconstructed_ground_alpha_lower_au.to_numpy()
     hi=early.plateau_reconstructed_ground_alpha_upper_au.to_numpy()
-    fig,axs=plt.subplots(1,2 if not controls else 1,figsize=(7.1,2.85) if not controls else (5.8,2.7),layout="constrained")
+    pcol="#6A3D9A";bcol="#1F78B4";ocol="#D95F02";gcol="#1B9E77"
+    fig,axs=plt.subplots(1,1 if controls else 2,figsize=(5.8,2.8) if controls else (7.35,3.15),layout="constrained")
     axs=np.atleast_1d(axs);a=axs[0]
-    a.fill_between(x,lo,hi,color=purple,alpha=.18,label="Four-field range")
-    a.plot(x,y,"o-",color=purple,ms=3,label="SA4 rank-two reconstruction")
+    a.fill_between(x,lo,hi,color=pcol,alpha=.15,lw=0)
+    a.plot(x,y,"o-",color=pcol,mfc="white",mew=1.05,ms=4.2,lw=1.7,label="SA4 rank-two target")
+    a.set(xlabel=r"Normalized source index, $\xi$",ylabel="Polarizability (a.u.)")
     if not controls:
-        for key,label,c in [("sa2_ground_alpha_au","SA2 root","#777777"),("ss_ground_alpha_au","State-specific",green)]:
-            z=early[key].to_numpy()
-            a.plot(x,z,"s-",color=c,ms=3,label=label)
-    a.set(xlabel="Normalized source index",ylabel=r"$\alpha_{\parallel}$ (a.u.)")
-    a.legend(loc="best",fontsize=7)
-    if not controls:
-        panel(a,"(a)");a=axs[1]
-        a.plot(x,early.plateau_external_ground_alpha_median_au,"o-",color=blue,ms=3,label="Aligned background")
-        a.plot(x,early.plateau_internal_manifold_ground_alpha_median_au,"s-",color=orange,ms=3,label="Internal mixing")
-        a.plot(x,y,"-",color=purple,lw=1,label="Total median")
-        a.set(xlabel="Normalized source index",ylabel="Response contribution (a.u.)");a.legend(loc="center right",fontsize=7);panel(a,"(b)")
-        for a in axs:
-            for j,l in [(5,"I"),(9,"II")]:
-                xx=j/57;a.axvline(xx,color=".4",ls="--",lw=.7)
-                a.text(xx,.98,l,transform=a.get_xaxis_transform(),ha="center",va="top",fontsize=8)
+        a.plot(x,early.sa2_ground_alpha_au,"--",color="#606060",lw=1.35,label="SA2 root")
+        z=early.ss_ground_alpha_au.to_numpy()
+        a.plot(x,z,"s-",color=gcol,mfc="white",mew=1.0,ms=4.0,lw=1.25,label="State-specific")
+        for j,lab in [(5,"I"),(9,"II")]:
+            k=np.flatnonzero(early.source_index.to_numpy()==j)[0]
+            a.vlines(x[k],y[k],33.2,color=black,ls=(0,(3,2)),lw=.8,zorder=0)
+            a.plot(x[k],y[k],"v",mfc="white",mec=black,ms=5.5,zorder=6)
+            a.text(x[k]+.004,y[k]+1.0,"Peak "+lab,fontsize=8.1)
+        a.legend(loc="lower right",fontsize=7.7,handlelength=2.)
+        style(a,"(a)")
+        a=axs[1]
+        a.plot(x,early.plateau_external_ground_alpha_median_au,"s-",color=bcol,mfc="white",mew=1.05,ms=4.2,lw=1.7,label="Aligned background")
+        a.plot(x,y,"--",color=pcol,lw=1.2,label="Total median")
+        a.set(xlabel=r"Normalized source index, $\xi$",ylabel="Response (a.u.)")
+        twin=a.twinx()
+        twin.plot(x,early.plateau_internal_manifold_ground_alpha_median_au,"^-",color=ocol,mfc="white",mew=1.05,ms=4.4,lw=1.7,label=r"Internal mixing $I$")
+        twin.set_ylabel("Internal mixing (a.u.)",color=ocol)
+        style(a,"(b)",right=False);twin.minorticks_off()
+        twin.tick_params(axis="y",direction="in",right=True,colors=ocol,width=.9,length=4.2)
+        for side in ['left','top','bottom']:twin.spines[side].set_visible(False)
+        twin.spines['right'].set_color('black');twin.spines['right'].set_linewidth(1.)
+        handles=a.get_lines()+twin.get_lines()
+        a.legend(handles,[h.get_label() for h in handles],loc="lower center",bbox_to_anchor=(.52,1.01),
+                 ncol=2,fontsize=7.3,handlelength=1.6,handletextpad=.4,columnspacing=.8,borderaxespad=0.)
+        for j in [5,9]:a.axvline(j/57,color=black,ls=(0,(3,2)),lw=.8,zorder=0)
     else:
-        a.annotate("Index 18: range test fails",xy=(18/57,y[-1]),xytext=(16/57,33.3),arrowprops={"arrowstyle":"->","lw":.7},fontsize=8)
-        a.set_ylim(26.8,34)
+        a.legend(loc="lower right",fontsize=8)
+        a.annotate("Index 18: range test fails",xy=(18/57,y[-1]),xytext=(16.35/57,33.3),
+                   arrowprops={"arrowstyle":"-","lw":.8,"color":black},fontsize=8.3,ha="center")
+        a.set_ylim(26.8,34);style(a)
     save(fig,name)
 reaction(s[s.source_index.between(2,11)],"HO2")
 reaction(s[s.source_index.between(15,18)],"HO2_controls",True)
-print("Wrote scheme, B2, HO2 and HO2_controls.")
-
+print("Wrote original-style B2, HO2, and HO2_controls from the current tables.")

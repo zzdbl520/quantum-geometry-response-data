@@ -12,6 +12,7 @@ belong to the separate single-state response study.
 
 - [Supplementary Material (PDF)](supporting_information/JCP_Supporting_Information.pdf)
 - [Supplementary Material (LaTeX)](supporting_information/JCP_Supporting_Information.tex)
+- [Main-text/SI reference map](docs/SI_CROSS_REFERENCES.md)
 - [Claim-to-file index](docs/CLAIM_EVIDENCE.md)
 - [Data definitions and scientific scope](docs/DATA_DICTIONARY.md)
 - [Reproduction and source-file provenance](docs/REPRODUCIBILITY.md)

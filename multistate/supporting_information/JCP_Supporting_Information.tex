@@ -13,14 +13,14 @@
 \date{22 October 2026}\maketitle
 
 \noindent
-This Supplementary Material provides the derivations, numerical criteria, and
-data definitions used in the main text. Sections S1--S5 concern the theory;
-Sec.~S6 documents the molecular calculations; Sec.~S7 describes independent
-checks of the equations and archived tables. Data and scripts are available in the
+Sections~S1--S5 give the derivations; Sec.~S6 describes the molecular
+calculations and numerical criteria; Sec.~S7 reports independent checks;
+Sec.~S8 describes the data and reproducibility scope. Data and scripts are
+available in the
 \href{https://github.com/zzdbl520/quantum-geometry-response-data/tree/main/multistate}{public reproducibility repository}.
-Its README identifies the files used for each result.
+Its README identifies the files supporting each result.
 
-\section{Resolvent expansion and its domain}
+\section{Resolvent expansion and its domain}\label{sec:resolvent}
 At fixed nuclear geometry, let $\hat H(F)=\hat H_0-F\hat\mu$.
 The spectral projector $\hat P$ selects the electronic states of interest,
 and $\hat Q=\hat I-\hat P$ selects their complement. We use
@@ -48,7 +48,7 @@ The projected Schr{\"o}dinger equation therefore gives the second-order response
 
 The one-state expression follows by setting $\hat{P}=|0\rangle\langle0|$ and expanding the complementary resolvent in eigenstates. For an excited state, signed denominators are retained. Positivity of the metric does not imply positivity of the polarizability.
 
-\section{Uncoupled state combinations and the response factorization}
+\section{Uncoupled state combinations and the response factorization}\label{sec:support}
 Put $\hat{T}=\Rop \hat{B}$, so $\hat{M}_2=\hat{T}^\dagger \hat{T}$. Then
 \begin{equation}
 \langle v|\hat{M}_2|v\rangle=\|\hat{T}|v\rangle\|^2,\qquad
@@ -82,7 +82,7 @@ r_{\rm supp}=\frac{\|A-\Pi A\Pi\|_F}{\max(\|A\|_F,\epsilon)}
 \end{equation}
 before claiming a full congruence. A negative metric eigenvalue larger than the numerical error should be investigated, not silently projected away. The reaction results do not establish convergence of the full response matrix or its response-weighted energy spectrum.
 
-\section{Projector derivative, canonical effective Hamiltonian, and finite width}
+\section{Projector derivative, canonical effective Hamiltonian, and finite width}\label{sec:projector}
 Differentiating $\hat{P}^2=\hat{P}$ and multiplying by $\hat{P}$ and $\hat{Q}$ gives
 \begin{equation}
 \hat{P}(\partial_F\hat{P})\hat{P}=0,\qquad \hat{Q}(\partial_F\hat{P})\hat{Q}=0.
@@ -148,7 +148,7 @@ A=\begin{pmatrix}2&1.8\\1.8&1.6\end{pmatrix}.
 \end{equation}
 The vector $(1,-1)^T$ lies in the null space of $\G$ but not that of $A$. Therefore the exact-degeneracy support proof cannot be transferred unconditionally to a split cluster.
 
-\section{Finite-field overlap estimators}
+\section{Finite-field overlap estimators}\label{sec:overlap}
 Here $\G=\Psi_0^\dagger\hat{\mathcal G}\Psi_0$ is the metric matrix and $I$ is the identity matrix. For orthonormal frames $\Psi_0,\Psi_F$, $S_{0F}S_{0F}^\dagger=\Psi_0^\dagger \hat{P}(F)\Psi_0$. Differentiation twice of $\hat{P}^2=\hat{P}$ gives
 \begin{equation}
 \hat{P} \hat{P}''\hat{P}=-2\hat{P} \hat{P}'\hat{P}'\hat{P}=-2\hat{X}^\dagger \hat{X}.
@@ -174,7 +174,7 @@ Some production fits include a small constant common-frame offset,
 \end{equation}
 Fitting the unscaled energy difference with an intercept avoids amplifying $C$ into $C/F^2$. A fitted offset is nevertheless a diagnostic of model or solver mismatch and does not justify fitting across a change of stationary solution. The \ce{C2} release uses an absolute offset gate of $5\times10^{-8}\,\Eh$. The \ce{B2} hybrid records explicitly retain their offsets and protocol differences.
 
-\section{Branch reconstruction and cusp derivation}
+\section{Branch reconstruction and cusp derivation}\label{sec:branch}
 Let $\widetilde H(F)=H_0+FD-\tfrac12F^2A+\cdots$, with a nondegenerate retained eigenvalue $E_0$. First-order perturbation of its eigenvector gives
 \begin{equation}
 \langle j|\partial_F0\rangle=\frac{D_{j0}}{E_0-E_j}.
@@ -189,7 +189,7 @@ Taking minus the second derivative gives the reconstruction formula. For optimiz
 
 At degeneracy, diagonalize the first-order perturbation instead. For the first-order perturbation $-\hat{\mu}_P$, minimization selects $d_{\max}$ at positive $F$ and $d_{\min}$ at negative $F$. Writing both slopes as a common linear term plus an absolute-value term gives $\kappa=(d_{\max}-d_{\min})/2$. If the first-order matrix is scalar, subtract that common shift and diagonalize the quadratic matrix. Higher-order nonanalyticities are not excluded by the absence of a linear cusp.
 
-\section{Computational details and numerical checks}
+\section{Computational details and numerical checks}\label{sec:computational}
 All three applications use the aug-cc-pVTZ basis. The electronic models and
 field strengths are summarized below. A ``pass'' in an archived file refers
 to that file's stated numerical criteria; it does not establish independence
@@ -339,7 +339,7 @@ criteria at 12 of the 14 geometries. The global 3\% scalar range criterion
 fails at index 18, with relative range 0.032426. These failures are retained
 alongside the locally resolved maxima at indices 5 and 9. High subspace
 overlap alone does not establish convergence of every response-matrix
-entry or of a response-weighted energy spectrum.
+entry or of a response-weighted energy spectrum. Table~\ref{tab:peaks} summarizes the local peak checks.
 
 \begin{table}[ht]
 \caption{Local peak checks recomputed from the four-field records. Response
@@ -362,13 +362,14 @@ $\dd A_{00}/\dd\xi=-\dd I/\dd\xi$; identifying a maximum additionally
 requires a derivative sign change or negative curvature. The present
 discrete data establish local orderings and do not directly measure those
 derivatives. SA2 and state-specific curves are separate model comparisons.
+Figure~\ref{fig:later-controls} shows the later control geometries.
 
 \begin{figure}[ht]
-\centering\includegraphics[width=0.9\linewidth]{../figures/HO2_controls.pdf}
+\centering\includegraphics[width=0.85\linewidth]{../figures/HO2_controls.pdf}
 \caption{Later reaction controls at indices 15--18. The envelope spans the
 same four field magnitudes as the earlier peaks. Neighboring envelopes
 overlap at indices 15 and 16, so these data do not resolve an additional
-peak there. Index 18 fails the global 3\% field-window range criterion.}
+peak there. Index 18 fails the global 3\% field-window range criterion.}\label{fig:later-controls}
 \end{figure}
 
 \subsection{Meaning of historical column names}
@@ -384,7 +385,7 @@ The internal and reconstructed columns represent $I$ and $A_{00}+I$.
 An accepted local scalar peak does not validate all other operator or
 energy-scale columns contained in the same exploratory table.
 
-\section{Independent checks of equations and numerical tables}
+\section{Independent checks of equations and numerical tables}\label{sec:checks}
 The two verification scripts use archived data and finite matrix models.
 
 \texttt{scripts/verify\_revision.py} uses a fixed random seed to test
@@ -393,6 +394,7 @@ covariance under complex unitary rotations, the split-cluster Sylvester
 equation, finite-field projector metrics, aligned quadratic matrices,
 the support counterexample, and the three-state cusp. It also recomputes
 the reaction envelopes from the individual field-pair rows.
+Table~\ref{tab:verification} summarizes the finite-dimensional checks.
 
 \input{verification_table.tex}
 
@@ -408,7 +410,7 @@ the reaction internal contribution and local peak margins. These are
 checks of the distributed numerical records. They do not reconstruct
 unavailable production wave functions.
 
-\section{Data access and reproducibility scope}
+\section{Data access and reproducibility scope}\label{sec:data}
 The \href{https://github.com/zzdbl520/quantum-geometry-response-data/tree/main/multistate}{public reproducibility repository}
 contains the molecular tables, available production and analysis scripts,
 the source reaction geometries, figure-generation scripts, verification
