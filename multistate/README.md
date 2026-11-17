@@ -29,6 +29,8 @@ belong to the separate single-state response study.
 
 [C2 SA6 wavefunction archive preparation](docs/C2_WAVEFUNCTION_RELEASE.md) describes the 119 zero-field and 888 finite-field source checkpoint inventory and the dedicated [Zenodo packager](scripts/prepare_C2_zenodo.py). The source files are not yet deposited on Zenodo.
 
+[HO2 SA2/SA4/SS wavefunction archive preparation](docs/HO2_WAVEFUNCTION_RELEASE.md) records the 599 checkpoint structural audit and links the [HO2 packager](scripts/prepare_HO2_zenodo.py). Raw checkpoint archives must be prepared and verified on cu02 before Zenodo release.
+
 ## Reproduce the reported analyses
 
 From this directory, with Python 3.10 or newer:
