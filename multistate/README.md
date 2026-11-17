@@ -23,6 +23,10 @@ belong to the separate single-state response study.
 | B2 | Symmetry-allowed cusp and near-crossing response in an explicitly hybrid three-state model | [13-geometry response](evidence/B2/B2_stage2_combined_runs/stage2c_runs/B2_final_near_crossing_response.csv), [original versus hybrid pair flags](evidence/B2/B2_stage2_combined_runs/stage2c_runs/hybrid_pair_audit.csv) |
 | Reaction | Two locally resolved scalar response maxima within the tested four-field window | [56 field pairs](evidence/HO2/manifold_pair_data.csv), [14-geometry summary](evidence/HO2/manifold_summary.csv), [retained failures](evidence/HO2/manifold_response_gate.json) |
 
+## B2 original-wavefunction archive preparation
+
+[Wavefunction audit and Zenodo release instructions](docs/B2_WAVEFUNCTION_RELEASE.md) document the 234 reconstructed signed-field checkpoints, 117 pairs, and the read-only archive-building script. Raw HDF5 wavefunctions remain on the research server until separately deposited on Zenodo; they are **not yet part of this GitHub repository**.
+
 ## Reproduce the reported analyses
 
 From this directory, with Python 3.10 or newer:
