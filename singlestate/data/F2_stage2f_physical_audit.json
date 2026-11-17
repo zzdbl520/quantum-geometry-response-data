@@ -1,0 +1,684 @@
+{
+  "source": "/workspace/scratch/b4a8fb48d26e/work/F2_stage2f_results/stage2f_resolution/F2_stage2f_final.json",
+  "stage2f_summary": {
+    "format_version": 1,
+    "count": 22,
+    "all_quality_pass": true,
+    "alpha_parallel_maximum": {
+      "r_angstrom": 1.5,
+      "alpha_perp_au": 5.55164270665344,
+      "alpha_parallel_au": 11.27236857516364,
+      "alpha_iso_au": 7.458551329490173,
+      "gff_perp_au": 2.4111634133200264,
+      "gff_parallel_au": 9.051664407474828,
+      "gff_iso_au": 4.62466374470496,
+      "zero_energy_hartree": -198.83408034264932,
+      "effective_unpaired_electrons": 0.6764160673074622,
+      "source_wavefunction_fidelity": 0.35883185270571355,
+      "source_active_subspace_min_singular_value": 0.9771844508025508,
+      "minimum_pm_fidelity": 0.9999637883498584,
+      "maximum_energy_asymmetry_hartree": 1.7053025658242404e-13,
+      "minimum_zero_fidelity": 0.9999909469152276,
+      "minimum_field_active_subspace_singular_value": 0.999999654403644,
+      "maximum_spin_square": 7.249256358244203e-30,
+      "field_details": {
+        "x": {
+          "alpha": 5.55164270665344,
+          "gff": 2.4111634133200264,
+          "energy_fourth_coefficient": 13.604341720081283,
+          "metric_fourth_coefficient": 6111.949723988695,
+          "energy_fit_max_residual": 2.1572219769376176e-13,
+          "metric_fit_max_residual": 2.4148109371237e-10,
+          "minimum_pm_fidelity": 0.9999903492775186,
+          "maximum_energy_asymmetry_hartree": 1.1368683772161603e-13,
+          "minimum_zero_fidelity": 0.9999975873031188,
+          "minimum_active_subspace_singular_value": 0.9999997419268835,
+          "maximum_spin_square": 7.249256358244203e-30,
+          "fields": [
+            0.0005,
+            0.00075,
+            0.001
+          ],
+          "pairs": [
+            {
+              "field": 0.0005,
+              "even_drop": 1.3879113112125196e-06,
+              "metric_loss": 2.4113039290840632e-06,
+              "fidelity_pm": 0.9999975886960709,
+              "energy_asymmetry": 2.842170943040401e-14,
+              "minimum_zero_fidelity": 0.9999993971729,
+              "minimum_active_smin": 0.999999935468018,
+              "maximum_spin_square": 2.022127041804292e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/px_F_5p00em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mx_F_5p00em04.h5"
+            },
+            {
+              "field": 0.00075,
+              "even_drop": 3.1228034913510783e-06,
+              "metric_loss": 5.427235524657625e-06,
+              "fidelity_pm": 0.9999945727644753,
+              "energy_asymmetry": 0.0,
+              "minimum_zero_fidelity": 0.9999986431859408,
+              "minimum_active_smin": 0.999999854837221,
+              "maximum_spin_square": 5.687000291877078e-31,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/px_F_7p50em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mx_F_7p50em04.h5"
+            },
+            {
+              "field": 0.001,
+              "even_drop": 5.551656272473338e-06,
+              "metric_loss": 9.650722481380214e-06,
+              "fidelity_pm": 0.9999903492775186,
+              "energy_asymmetry": 1.1368683772161603e-13,
+              "minimum_zero_fidelity": 0.9999975873031188,
+              "minimum_active_smin": 0.9999997419268835,
+              "maximum_spin_square": 7.249256358244203e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/px_F_1p00em03.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mx_F_1p00em03.h5"
+            }
+          ],
+          "pointwise_alpha_au": [
+            5.551645244850079,
+            5.551650651290806,
+            5.551656272473338
+          ],
+          "pointwise_gff_au": [
+            2.411303929084063,
+            2.4121046776256114,
+            2.4126806203450535
+          ],
+          "energy_fit_relative_residual": 3.885726837293091e-08,
+          "metric_fit_relative_residual": 2.5022074168879655e-05,
+          "pointwise_alpha_relative_spread": 1.9863712132952204e-06,
+          "pointwise_gff_relative_spread": 0.0005709655568697643,
+          "field_limit_fit_pass": true
+        },
+        "z": {
+          "alpha": 11.27236857516364,
+          "gff": 9.051664407474828,
+          "energy_fourth_coefficient": 92.67119740023632,
+          "metric_fourth_coefficient": 5315.400050913647,
+          "energy_fit_max_residual": 9.048161240979118e-12,
+          "metric_fit_max_residual": 1.8081749857302857e-09,
+          "minimum_pm_fidelity": 0.9999637883498584,
+          "maximum_energy_asymmetry_hartree": 1.7053025658242404e-13,
+          "minimum_zero_fidelity": 0.9999909469152276,
+          "minimum_active_subspace_singular_value": 0.999999654403644,
+          "maximum_spin_square": 6.915851553797314e-30,
+          "fields": [
+            0.0005,
+            0.00075,
+            0.001
+          ],
+          "pairs": [
+            {
+              "field": 0.0005,
+              "even_drop": 2.8180888875795063e-06,
+              "metric_loss": 9.05018844499228e-06,
+              "fidelity_pm": 0.999990949811555,
+              "energy_asymmetry": 1.7053025658242404e-13,
+              "minimum_zero_fidelity": 0.9999977374424834,
+              "minimum_active_smin": 0.9999999136936045,
+              "maximum_spin_square": 6.915851553797314e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/pz_F_5p00em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mz_F_5p00em04.h5"
+            },
+            {
+              "field": 0.00075,
+              "even_drop": 6.3407435391127365e-06,
+              "metric_loss": 2.0369304399747712e-05,
+              "fidelity_pm": 0.9999796306956003,
+              "energy_asymmetry": 0.0,
+              "minimum_zero_fidelity": 0.9999949076200373,
+              "minimum_active_smin": 0.9999998056561635,
+              "maximum_spin_square": 1.691652603714681e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/pz_F_7p50em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mz_F_7p50em04.h5"
+            },
+            {
+              "field": 0.001,
+              "even_drop": 1.127245963061796e-05,
+              "metric_loss": 3.6211650141559915e-05,
+              "fidelity_pm": 0.9999637883498584,
+              "energy_asymmetry": 5.684341886080802e-14,
+              "minimum_zero_fidelity": 0.9999909469152276,
+              "minimum_active_smin": 0.999999654403644,
+              "maximum_spin_square": 1.8132389685162777e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/pz_F_1p00em03.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mz_F_1p00em03.h5"
+            }
+          ],
+          "pointwise_alpha_au": [
+            11.272355550318025,
+            11.272432958422643,
+            11.27245963061796
+          ],
+          "pointwise_gff_au": [
+            9.05018844499228,
+            9.05302417766565,
+            9.052912535389979
+          ],
+          "energy_fit_relative_residual": 8.026785224763847e-07,
+          "metric_fit_relative_residual": 4.993351528200735e-05,
+          "pointwise_alpha_relative_spread": 9.23322363353689e-06,
+          "pointwise_gff_relative_spread": 0.0003132830102526095,
+          "field_limit_fit_pass": true
+        }
+      },
+      "quality_pass": true,
+      "delta_eff_perp_hartree": 1.1512373396146476,
+      "delta_eff_parallel_hartree": 0.6226682777730338,
+      "delta_eff_iso_hartree": 0.8063885010050613,
+      "field_limit_fit_pass": true
+    },
+    "alpha_parallel_maximum_is_interior": true,
+    "alpha_iso_maximum": {
+      "r_angstrom": 1.6,
+      "alpha_perp_au": 5.690729876818872,
+      "alpha_parallel_au": 11.105032210705774,
+      "alpha_iso_au": 7.495497321447839,
+      "gff_perp_au": 2.6130190904272004,
+      "gff_parallel_au": 8.85556146998001,
+      "gff_iso_au": 4.693866550278137,
+      "zero_energy_hartree": -198.8299548523355,
+      "effective_unpaired_electrons": 0.9038295331575458,
+      "source_wavefunction_fidelity": 0.35913380310848725,
+      "source_active_subspace_min_singular_value": 0.9793691469838054,
+      "minimum_pm_fidelity": 0.9999645578927222,
+      "maximum_energy_asymmetry_hartree": 1.1368683772161603e-13,
+      "minimum_zero_fidelity": 0.9999911392781083,
+      "minimum_field_active_subspace_singular_value": 0.9999996405677315,
+      "maximum_spin_square": 6.742697826987574e-30,
+      "field_details": {
+        "x": {
+          "alpha": 5.690729876818872,
+          "gff": 2.6130190904272004,
+          "energy_fourth_coefficient": 11.261308986138372,
+          "metric_fourth_coefficient": 3764.14764148789,
+          "energy_fit_max_residual": 5.3301010396602047e-14,
+          "metric_fit_max_residual": 4.146149711680577e-10,
+          "minimum_pm_fidelity": 0.999989544233529,
+          "maximum_energy_asymmetry_hartree": 5.684341886080802e-14,
+          "minimum_zero_fidelity": 0.9999973860397136,
+          "minimum_active_subspace_singular_value": 0.9999997283567152,
+          "maximum_spin_square": 6.742697826987574e-30,
+          "fields": [
+            0.0005,
+            0.00075,
+            0.001
+          ],
+          "pairs": [
+            {
+              "field": 0.0005,
+              "even_drop": 1.42268322633754e-06,
+              "metric_loss": 2.612839734683625e-06,
+              "fidelity_pm": 0.9999973871602653,
+              "energy_asymmetry": 0.0,
+              "minimum_zero_fidelity": 0.9999993467887635,
+              "minimum_active_smin": 0.9999999320843911,
+              "maximum_spin_square": 3.124740836915146e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/px_F_5p00em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/mx_F_5p00em04.h5"
+            },
+            {
+              "field": 0.00075,
+              "even_drop": 3.2010390782488685e-06,
+              "metric_loss": 5.880799850421781e-06,
+              "fidelity_pm": 0.9999941192001496,
+              "energy_asymmetry": 5.684341886080802e-14,
+              "minimum_zero_fidelity": 0.9999985297940105,
+              "minimum_active_smin": 0.9999998472063975,
+              "maximum_spin_square": 6.742697826987574e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/px_F_7p50em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/mx_F_7p50em04.h5"
+            },
+            {
+              "field": 0.001,
+              "even_drop": 5.690741147645895e-06,
+              "metric_loss": 1.045576647096258e-05,
+              "fidelity_pm": 0.999989544233529,
+              "energy_asymmetry": 5.684341886080802e-14,
+              "minimum_zero_fidelity": 0.9999973860397136,
+              "minimum_active_smin": 0.9999997283567152,
+              "maximum_spin_square": 4.134250119186635e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/px_F_1p00em03.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/mx_F_1p00em03.h5"
+            }
+          ],
+          "pointwise_alpha_au": [
+            5.69073290535016,
+            5.6907361391091,
+            5.690741147645895
+          ],
+          "pointwise_gff_au": [
+            2.612839734683625,
+            2.61368882240968,
+            2.613941617740645
+          ],
+          "energy_fit_relative_residual": 9.366268648267586e-09,
+          "metric_fit_relative_residual": 3.9654192002041473e-05,
+          "pointwise_alpha_relative_spread": 1.448372337684146e-06,
+          "pointwise_gff_relative_spread": 0.0004216896313756368,
+          "field_limit_fit_pass": true
+        },
+        "z": {
+          "alpha": 11.105032210705774,
+          "gff": 8.85556146998001,
+          "energy_fourth_coefficient": 179.28709093823568,
+          "metric_fourth_coefficient": 19910.535387593347,
+          "energy_fit_max_residual": 3.905243303097759e-12,
+          "metric_fit_max_residual": 2.751700740621807e-10,
+          "minimum_pm_fidelity": 0.9999645578927222,
+          "maximum_energy_asymmetry_hartree": 1.1368683772161603e-13,
+          "minimum_zero_fidelity": 0.9999911392781083,
+          "minimum_active_subspace_singular_value": 0.9999996405677315,
+          "maximum_spin_square": 6.411282358650355e-30,
+          "fields": [
+            0.0005,
+            0.00075,
+            0.001
+          ],
+          "pairs": [
+            {
+              "field": 0.0005,
+              "even_drop": 2.77627316336293e-06,
+              "metric_loss": 8.856530708367671e-06,
+              "fidelity_pm": 0.9999911434692916,
+              "energy_asymmetry": 8.526512829121202e-14,
+              "minimum_zero_fidelity": 0.9999977858552703,
+              "minimum_active_smin": 0.9999999102935607,
+              "maximum_spin_square": 1.9390924718509074e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/pz_F_5p00em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/mz_F_5p00em04.h5"
+            },
+            {
+              "field": 0.00075,
+              "even_drop": 6.246634370654647e-06,
+              "metric_loss": 1.9931522778682265e-05,
+              "fidelity_pm": 0.9999800684772213,
+              "energy_asymmetry": 1.1368683772161603e-13,
+              "minimum_zero_fidelity": 0.9999950170576892,
+              "minimum_active_smin": 0.9999997979661628,
+              "maximum_spin_square": 6.411282358650355e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/pz_F_7p50em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/mz_F_7p50em04.h5"
+            },
+            {
+              "field": 0.001,
+              "even_drop": 1.1105212195161585e-05,
+              "metric_loss": 3.54421072777944e-05,
+              "fidelity_pm": 0.9999645578927222,
+              "energy_asymmetry": 5.684341886080802e-14,
+              "minimum_zero_fidelity": 0.9999911392781083,
+              "minimum_active_smin": 0.9999996405677315,
+              "maximum_spin_square": 3.382679280197436e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/pz_F_1p00em03.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p6000/mz_F_1p00em03.h5"
+            }
+          ],
+          "pointwise_alpha_au": [
+            11.10509265345172,
+            11.105127770052706,
+            11.105212195161585
+          ],
+          "pointwise_gff_au": [
+            8.856530708367671,
+            8.858454568303229,
+            8.8605268194486
+          ],
+          "energy_fit_relative_residual": 3.5165859368263396e-07,
+          "metric_fit_relative_residual": 7.763930962270503e-06,
+          "pointwise_alpha_relative_spread": 1.0764643235256482e-05,
+          "pointwise_gff_relative_spread": 0.00045125440035338206,
+          "field_limit_fit_pass": true
+        }
+      },
+      "quality_pass": true,
+      "delta_eff_perp_hartree": 1.088918542093104,
+      "delta_eff_parallel_hartree": 0.627008928138062,
+      "delta_eff_iso_hartree": 0.7984352815701259,
+      "field_limit_fit_pass": true
+    },
+    "gff_parallel_maximum": {
+      "r_angstrom": 1.5,
+      "alpha_perp_au": 5.55164270665344,
+      "alpha_parallel_au": 11.27236857516364,
+      "alpha_iso_au": 7.458551329490173,
+      "gff_perp_au": 2.4111634133200264,
+      "gff_parallel_au": 9.051664407474828,
+      "gff_iso_au": 4.62466374470496,
+      "zero_energy_hartree": -198.83408034264932,
+      "effective_unpaired_electrons": 0.6764160673074622,
+      "source_wavefunction_fidelity": 0.35883185270571355,
+      "source_active_subspace_min_singular_value": 0.9771844508025508,
+      "minimum_pm_fidelity": 0.9999637883498584,
+      "maximum_energy_asymmetry_hartree": 1.7053025658242404e-13,
+      "minimum_zero_fidelity": 0.9999909469152276,
+      "minimum_field_active_subspace_singular_value": 0.999999654403644,
+      "maximum_spin_square": 7.249256358244203e-30,
+      "field_details": {
+        "x": {
+          "alpha": 5.55164270665344,
+          "gff": 2.4111634133200264,
+          "energy_fourth_coefficient": 13.604341720081283,
+          "metric_fourth_coefficient": 6111.949723988695,
+          "energy_fit_max_residual": 2.1572219769376176e-13,
+          "metric_fit_max_residual": 2.4148109371237e-10,
+          "minimum_pm_fidelity": 0.9999903492775186,
+          "maximum_energy_asymmetry_hartree": 1.1368683772161603e-13,
+          "minimum_zero_fidelity": 0.9999975873031188,
+          "minimum_active_subspace_singular_value": 0.9999997419268835,
+          "maximum_spin_square": 7.249256358244203e-30,
+          "fields": [
+            0.0005,
+            0.00075,
+            0.001
+          ],
+          "pairs": [
+            {
+              "field": 0.0005,
+              "even_drop": 1.3879113112125196e-06,
+              "metric_loss": 2.4113039290840632e-06,
+              "fidelity_pm": 0.9999975886960709,
+              "energy_asymmetry": 2.842170943040401e-14,
+              "minimum_zero_fidelity": 0.9999993971729,
+              "minimum_active_smin": 0.999999935468018,
+              "maximum_spin_square": 2.022127041804292e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/px_F_5p00em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mx_F_5p00em04.h5"
+            },
+            {
+              "field": 0.00075,
+              "even_drop": 3.1228034913510783e-06,
+              "metric_loss": 5.427235524657625e-06,
+              "fidelity_pm": 0.9999945727644753,
+              "energy_asymmetry": 0.0,
+              "minimum_zero_fidelity": 0.9999986431859408,
+              "minimum_active_smin": 0.999999854837221,
+              "maximum_spin_square": 5.687000291877078e-31,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/px_F_7p50em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mx_F_7p50em04.h5"
+            },
+            {
+              "field": 0.001,
+              "even_drop": 5.551656272473338e-06,
+              "metric_loss": 9.650722481380214e-06,
+              "fidelity_pm": 0.9999903492775186,
+              "energy_asymmetry": 1.1368683772161603e-13,
+              "minimum_zero_fidelity": 0.9999975873031188,
+              "minimum_active_smin": 0.9999997419268835,
+              "maximum_spin_square": 7.249256358244203e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/px_F_1p00em03.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mx_F_1p00em03.h5"
+            }
+          ],
+          "pointwise_alpha_au": [
+            5.551645244850079,
+            5.551650651290806,
+            5.551656272473338
+          ],
+          "pointwise_gff_au": [
+            2.411303929084063,
+            2.4121046776256114,
+            2.4126806203450535
+          ],
+          "energy_fit_relative_residual": 3.885726837293091e-08,
+          "metric_fit_relative_residual": 2.5022074168879655e-05,
+          "pointwise_alpha_relative_spread": 1.9863712132952204e-06,
+          "pointwise_gff_relative_spread": 0.0005709655568697643,
+          "field_limit_fit_pass": true
+        },
+        "z": {
+          "alpha": 11.27236857516364,
+          "gff": 9.051664407474828,
+          "energy_fourth_coefficient": 92.67119740023632,
+          "metric_fourth_coefficient": 5315.400050913647,
+          "energy_fit_max_residual": 9.048161240979118e-12,
+          "metric_fit_max_residual": 1.8081749857302857e-09,
+          "minimum_pm_fidelity": 0.9999637883498584,
+          "maximum_energy_asymmetry_hartree": 1.7053025658242404e-13,
+          "minimum_zero_fidelity": 0.9999909469152276,
+          "minimum_active_subspace_singular_value": 0.999999654403644,
+          "maximum_spin_square": 6.915851553797314e-30,
+          "fields": [
+            0.0005,
+            0.00075,
+            0.001
+          ],
+          "pairs": [
+            {
+              "field": 0.0005,
+              "even_drop": 2.8180888875795063e-06,
+              "metric_loss": 9.05018844499228e-06,
+              "fidelity_pm": 0.999990949811555,
+              "energy_asymmetry": 1.7053025658242404e-13,
+              "minimum_zero_fidelity": 0.9999977374424834,
+              "minimum_active_smin": 0.9999999136936045,
+              "maximum_spin_square": 6.915851553797314e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/pz_F_5p00em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mz_F_5p00em04.h5"
+            },
+            {
+              "field": 0.00075,
+              "even_drop": 6.3407435391127365e-06,
+              "metric_loss": 2.0369304399747712e-05,
+              "fidelity_pm": 0.9999796306956003,
+              "energy_asymmetry": 0.0,
+              "minimum_zero_fidelity": 0.9999949076200373,
+              "minimum_active_smin": 0.9999998056561635,
+              "maximum_spin_square": 1.691652603714681e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/pz_F_7p50em04.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mz_F_7p50em04.h5"
+            },
+            {
+              "field": 0.001,
+              "even_drop": 1.127245963061796e-05,
+              "metric_loss": 3.6211650141559915e-05,
+              "fidelity_pm": 0.9999637883498584,
+              "energy_asymmetry": 5.684341886080802e-14,
+              "minimum_zero_fidelity": 0.9999909469152276,
+              "minimum_active_smin": 0.999999654403644,
+              "maximum_spin_square": 1.8132389685162777e-30,
+              "plus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/pz_F_1p00em03.h5",
+              "minus": "/mnt/F2_quantum_geometry/F2_charge_shift_qgeom_package/F2_qgeom_runs/stage2b_repair/selected_field_view/R_01p5000/mz_F_1p00em03.h5"
+            }
+          ],
+          "pointwise_alpha_au": [
+            11.272355550318025,
+            11.272432958422643,
+            11.27245963061796
+          ],
+          "pointwise_gff_au": [
+            9.05018844499228,
+            9.05302417766565,
+            9.052912535389979
+          ],
+          "energy_fit_relative_residual": 8.026785224763847e-07,
+          "metric_fit_relative_residual": 4.993351528200735e-05,
+          "pointwise_alpha_relative_spread": 9.23322363353689e-06,
+          "pointwise_gff_relative_spread": 0.0003132830102526095,
+          "field_limit_fit_pass": true
+        }
+      },
+      "quality_pass": true,
+      "delta_eff_perp_hartree": 1.1512373396146476,
+      "delta_eff_parallel_hartree": 0.6226682777730338,
+      "delta_eff_iso_hartree": 0.8063885010050613,
+      "field_limit_fit_pass": true
+    },
+    "minimum_source_wavefunction_fidelity": 3.148419430745828e-24,
+    "minimum_field_to_zero_fidelity": 0.999972042594899,
+    "stage2_format_version": 2,
+    "expected_field_states": 264,
+    "certified_field_states": 264,
+    "plateau_restart_states": 43,
+    "all_field_limit_fits_pass": true,
+    "extrema": {
+      "alpha_iso": {
+        "grid_index": 5,
+        "grid_r_angstrom": 1.6,
+        "grid_value": 7.495497321447839,
+        "interior": true,
+        "quadratic_vertex_available": true,
+        "quadratic_r_angstrom": 1.5769935892804492,
+        "quadratic_value": 7.499119538222892,
+        "quadratic_coefficients": [
+          -6.843475236620483,
+          21.584233153100012,
+          -9.519979117763736
+        ]
+      },
+      "alpha_parallel": {
+        "grid_index": 4,
+        "grid_r_angstrom": 1.5,
+        "grid_value": 11.27236857516364,
+        "interior": true,
+        "quadratic_vertex_available": true,
+        "quadratic_r_angstrom": 1.5200931635515746,
+        "quadratic_value": 11.283663581957143,
+        "quadratic_coefficients": [
+          -27.976273041519466,
+          85.05308278413192,
+          -53.360641257615384
+        ]
+      },
+      "gff_iso": {
+        "grid_index": 16,
+        "grid_r_angstrom": 2.7,
+        "grid_value": 42.83489016581087,
+        "interior": true,
+        "quadratic_vertex_available": true,
+        "quadratic_r_angstrom": 2.6816338559496806,
+        "quadratic_value": 43.81802175933626,
+        "quadratic_coefficients": [
+          -2914.5779844151584,
+          15631.66199762654,
+          -20915.378997039337
+        ]
+      },
+      "gff_parallel": {
+        "grid_index": 4,
+        "grid_r_angstrom": 1.5,
+        "grid_value": 9.051664407474828,
+        "interior": true,
+        "quadratic_vertex_available": true,
+        "quadratic_r_angstrom": 1.5275166713372645,
+        "quadratic_value": 9.08468503235946,
+        "quadratic_coefficients": [
+          -43.610743861918685,
+          133.23227659700015,
+          -92.67257679870823
+        ]
+      }
+    },
+    "candidate_refinement_centers_angstrom": [
+      1.520093,
+      1.527517,
+      1.576994,
+      2.681634
+    ],
+    "production_geometry_count": true,
+    "alpha_extrema_are_interior": true,
+    "recommended_next_step": "refine_zero_and_field_grids_around_the_reported_interior_centers",
+    "stage2d_format_version": 1,
+    "metric_estimator": "symmetric_plus_minus_overlap_for_unrepaired_windows; same_sign_projective_secant_F_to_0_or_resolution_aware_exact_inversion_F2_fit_for_the_nine_Stage2B_metric_failures",
+    "polarizability_estimator": "unchanged_Stage2B_symmetric_energy_F_to_0_fit",
+    "new_descending_continuation_states": 20,
+    "secant_repaired_windows": 9
+  },
+  "exact_factorization": "alpha_iso = 2 * gff_iso * delta_eff_iso",
+  "maximum_absolute_factorization_error_au": 8.881784197001252e-16,
+  "coarse_grid_local_maxima": [
+    {
+      "label": "primary",
+      "grid_peak_r_angstrom": 1.6,
+      "grid_peak_alpha_iso_au": 7.495497321447839,
+      "quadratic_vertex": {
+        "r_angstrom": 1.5769935892804525,
+        "value_au": 7.499119538222896,
+        "second_derivative_au_per_angstrom2": -13.686950473241595
+      },
+      "relative_margin_over_left_neighbor": 0.0049290914762851155,
+      "relative_margin_over_right_neighbor": 0.013331138480810379,
+      "transverse_pointwise_alpha_relative_spread": 1.4483705932748032e-06,
+      "all_current_quality_gates_pass": true,
+      "all_current_field_limit_gates_pass": true,
+      "assessment": "confirmed_broad_primary_maximum"
+    },
+    {
+      "label": "sharp_outer",
+      "grid_peak_r_angstrom": 2.7,
+      "grid_peak_alpha_iso_au": 6.514493249423548,
+      "quadratic_vertex": {
+        "r_angstrom": 2.6935392205137445,
+        "value_au": 6.514943387195785,
+        "second_derivative_au_per_angstrom2": -21.567788507277776
+      },
+      "relative_margin_over_left_neighbor": 0.014414700635315737,
+      "relative_margin_over_right_neighbor": 0.018692691883954154,
+      "transverse_pointwise_alpha_relative_spread": 0.0209170069357847,
+      "all_current_quality_gates_pass": true,
+      "all_current_field_limit_gates_pass": true,
+      "assessment": "field_gated_second_maximum_candidate_requires_geometry_and_energy_field_refinement"
+    },
+    {
+      "label": "long_range_rebound",
+      "grid_peak_r_angstrom": 3.2,
+      "grid_peak_alpha_iso_au": 6.429825919560911,
+      "quadratic_vertex": {
+        "r_angstrom": 3.2112044253475456,
+        "value_au": 6.4301344995781875,
+        "second_derivative_au_per_angstrom2": -4.916076359141239
+      },
+      "relative_margin_over_left_neighbor": 0.017004797744827542,
+      "relative_margin_over_right_neighbor": 0.03183583747858082,
+      "transverse_pointwise_alpha_relative_spread": 4.140057892318724e-06,
+      "all_current_quality_gates_pass": true,
+      "all_current_field_limit_gates_pass": true,
+      "assessment": "numerically_clean_coarse_grid_rebound_requires_geometry_and_branch_continuity_refinement"
+    }
+  ],
+  "sharp_outer_peak_logarithmic_slope_balance": {
+    "r_angstrom": 2.7,
+    "d_ln_gff_dR_per_angstrom": -10.506915269263581,
+    "d_ln_delta_dR_per_angstrom": 10.48516523584415,
+    "d_ln_alpha_dR_per_angstrom": -0.021750033419435405,
+    "factorization_slope_closure": -3.552713678800501e-15
+  },
+  "metric_spike": {
+    "r_angstrom": 2.7,
+    "gff_iso_au": 42.83489016581087,
+    "gff_perp_au": 62.75390110945838,
+    "gff_parallel_au": 2.996868278515861,
+    "delta_eff_iso_hartree": 0.07604190444059036,
+    "interpretation": "The second polarizability maximum is produced by near-cancellation between a sharp transverse quantum-metric enhancement and collapse of the effective energy scale."
+  },
+  "recommended_refinement_windows": [
+    {
+      "purpose": "precise_primary_maximum",
+      "r_angstrom": [
+        1.5,
+        1.65
+      ],
+      "suggested_spacing_angstrom": 0.025
+    },
+    {
+      "purpose": "confirm_sharp_outer_maximum_and_metric_spike",
+      "r_angstrom": [
+        2.6,
+        2.8
+      ],
+      "suggested_spacing_angstrom": 0.025,
+      "priority": "highest"
+    },
+    {
+      "purpose": "test_long_range_rebound_and_outer_PES_structure",
+      "r_angstrom": [
+        3.0,
+        3.5
+      ],
+      "suggested_spacing_angstrom": 0.05
+    }
+  ],
+  "publication_status": "The primary maximum and the 2.7-A quantum-metric spike are established on the present grid. A multiple-maximum polarizability claim requires the recommended geometry refinement, with tighter transverse finite-field extrapolation at the sharp outer feature."
+}

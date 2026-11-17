@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "expected_points": [
+    0.65,
+    0.675,
+    0.7,
+    0.725,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "completed_points": [
+    0.65,
+    0.675,
+    0.7,
+    0.725,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "failures": [],
+  "summary_csv": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/OsO4_def2TZVP_qgeom_summary.csv",
+  "minimum_alpha_grid_point": 0.7,
+  "minimum_alpha_grid_value_au": 26.74939435109991
+}

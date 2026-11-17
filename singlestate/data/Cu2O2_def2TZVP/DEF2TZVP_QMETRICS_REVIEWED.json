@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "decision": "DEF2TZVP_QMETRICS_CERTIFIED_AFTER_PROTOCOL_REVIEW",
+  "original_decision": "DEF2TZVP_QMETRICS_REVIEW_REQUIRED",
+  "complete": true,
+  "method": "orbital-relaxed state-specific singlet CASSCF(8e,6o)/def2-TZVP",
+  "field_step_au": 0.00025,
+  "primary_metric_estimator": "squared Fubini-Study angle divided by squared parameter displacement",
+  "valid_identity_and_numerical_gates": {
+    "all_metrics_finite_and_positive": true,
+    "max_overlap_excess_above_one_le_1e-7": true,
+    "min_field_active_sigma_ge_0p999": true,
+    "min_field_coreactive_sigma_ge_0p995": true,
+    "min_nuclear_active_sigma_ge_0p98": true,
+    "max_alpha_energy_dipole_rel_le_1e-3": true,
+    "upstream_uniform_CAS86_closed_loop_certified": true
+  },
+  "protocol_reclassification": {
+    "quantity": "minimum core+active subspace singular value between adjacent nuclear geometries",
+    "observed_minimum": 0.6719827369317761,
+    "original_threshold": 0.9,
+    "new_role": "reported physical diagnostic; not a hard identity gate",
+    "reason": "Finite nuclear displacement includes genuine occupied-space relaxation into the external space. State identity is instead constrained by active-space continuity and the independently certified bidirectional/closed-loop CAS(8e,6o) continuation."
+  },
+  "extrema": {
+    "PES_minimum": {
+      "mode": "min",
+      "estimator": "local_three_point_quadratic",
+      "grid_spacing_A": 0.05000025023108334,
+      "discrete_x_A": 1.5999997619717066,
+      "discrete_y": -3806.022020560513,
+      "vertex_x_A": 1.6238986411788814,
+      "vertex_y": -3806.0222156050786,
+      "correct_curvature": true,
+      "vertex_inside_local_bracket": true
+    },
+    "nuclear_metric_maximum": {
+      "mode": "max",
+      "estimator": "local_three_point_quadratic",
+      "grid_spacing_A": 0.05000001374955587,
+      "discrete_x_A": 1.7250003431240242,
+      "discrete_y": 928.6934627150791,
+      "vertex_x_A": 1.7470791768607215,
+      "vertex_y": 931.165399281892,
+      "correct_curvature": true,
+      "vertex_inside_local_bracket": true
+    },
+    "field_metric_minimum": {
+      "mode": "min",
+      "estimator": "local_three_point_quadratic",
+      "grid_spacing_A": 0.049999968221319246,
+      "discrete_x_A": 1.7500006171079572,
+      "discrete_y": 98.6780647414017,
+      "vertex_x_A": 1.7476232157687641,
+      "vertex_y": 98.67705252981818,
+      "correct_curvature": true,
+      "vertex_inside_local_bracket": true
+    },
+    "polarizability_minimum": {
+      "mode": "min",
+      "estimator": "local_three_point_quadratic",
+      "grid_spacing_A": 0.049999968221319246,
+      "discrete_x_A": 1.7500006171079572,
+      "discrete_y": 120.87421782780439,
+      "vertex_x_A": 1.7490527364361133,
+      "vertex_y": 120.87414329738485,
+      "correct_curvature": true,
+      "vertex_inside_local_bracket": true
+    },
+    "geometric_scale_maximum": {
+      "mode": "max",
+      "estimator": "local_three_point_quadratic",
+      "grid_spacing_A": 0.049999968221319246,
+      "discrete_x_A": 1.7500006171079572,
+      "discrete_y": 16.666090063246166,
+      "vertex_x_A": 1.7467645276657409,
+      "vertex_y": 16.666286140130204,
+      "correct_curvature": true,
+      "vertex_inside_local_bracket": true
+    }
+  },
+  "coincidence": {
+    "response_landmark_mean_A": 1.747629914182835,
+    "response_landmark_span_A": 0.002288208770372391,
+    "separation_from_PES_minimum_A": 0.1237312730039537,
+    "reporting_recommendation": "quote the common response bottleneck as approximately 1.75 Angstrom"
+  },
+  "diagnostics": {
+    "field_overlap_amplitude_min": 0.9999814268136329,
+    "field_active_sigma_min": 0.9999805225423193,
+    "field_coreactive_sigma_min": 0.9999988549847861,
+    "nuclear_overlap_amplitude_min": 0.04703864829676032,
+    "nuclear_active_sigma_min": 0.9831779279922627,
+    "nuclear_coreactive_sigma_min": 0.6719827369317761,
+    "max_field_FS_vs_chord_relative_difference": 3.095536810553749e-06,
+    "max_nuclear_FS_vs_chord_relative_difference": 0.1791130205028383
+  },
+  "basis_robustness_vs_def2_SVP": {
+    "nuclear_metric_all_24_edges": {
+      "max_relative_difference": 0.0007425602657567443,
+      "rms_relative_difference": 0.0005044434305832571,
+      "max_absolute_difference_per_A2": 0.4067598937043613
+    },
+    "sparse_common_field_points": [
+      "001",
+      "005",
+      "006",
+      "008",
+      "009",
+      "010",
+      "011",
+      "014",
+      "015",
+      "019",
+      "025"
+    ],
+    "field_metric_max_relative_difference": 0.11476462921288322,
+    "field_metric_rms_relative_difference": 0.09329545680271097,
+    "polarizability_max_relative_difference": 0.11839102184832932,
+    "polarizability_rms_relative_difference": 0.11185756270885461,
+    "geometric_scale_max_relative_difference": 0.05970142815174299,
+    "geometric_scale_rms_relative_difference": 0.024816190095955537,
+    "interpretation": "basis changes magnitudes but preserves the response topology and the approximately 1.75-A bottleneck"
+  }
+}

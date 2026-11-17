@@ -1,0 +1,245 @@
+nohup: ignoring input
+PAIR_START lambda=0.650
+RECOVERY_PASS E=-384.138316545769271 dE=4.196e-10 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-384.138316544330337 dE=4.072e-10 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.65,
+  "field_au": 0.001,
+  "alpha_iso_au": 29.679616091016214,
+  "many_electron_overlap_abs": 0.9999389054026377,
+  "many_electron_fidelity": 0.9998778145378253,
+  "g_ff_au": 30.548231856592682,
+  "delta_geom_hartree": 0.485782879846301,
+  "closure_alpha_au": 29.679616091016214,
+  "cross_core_determinant_abs": 0.99989051550365,
+  "effective_active_min_sv": 0.999864265897531,
+  "effective_active_max_sv": 1.0000533998653818,
+  "plus_recovery_energy_error_hartree": 4.1961811803048477e-10,
+  "minus_recovery_energy_error_hartree": 4.071694092999678e-10
+}
+PAIR_DONE lambda=0.650
+PAIR_START lambda=0.675
+RECOVERY_PASS E=-385.344743493752503 dE=4.047e-11 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-385.344743494249315 dE=6.276e-11 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.675,
+  "field_au": 0.001,
+  "alpha_iso_au": 27.325138717060327,
+  "many_electron_overlap_abs": 0.9999579180164301,
+  "many_electron_fidelity": 0.9999158378037535,
+  "g_ff_au": 21.041434520720877,
+  "delta_geom_hartree": 0.6493173906501355,
+  "closure_alpha_au": 27.325138717060327,
+  "cross_core_determinant_abs": 0.9999582917269265,
+  "effective_active_min_sv": 0.9999643535597222,
+  "effective_active_max_sv": 1.000017133906715,
+  "plus_recovery_energy_error_hartree": 4.0472514228895307e-11,
+  "minus_recovery_energy_error_hartree": 6.275513442233205e-11
+}
+PAIR_DONE lambda=0.675
+PAIR_START lambda=0.700
+RECOVERY_RESUME /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/lambda_0p700/plus
+RECOVERY_RESUME /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/lambda_0p700/minus
+{
+  "status": "PASS",
+  "lambda": 0.7,
+  "field_au": 0.001,
+  "alpha_iso_au": 26.74939435109991,
+  "many_electron_overlap_abs": 0.9999626458809131,
+  "many_electron_fidelity": 0.9999252931571564,
+  "g_ff_au": 18.677408384695557,
+  "delta_geom_hartree": 0.7160895612535466,
+  "closure_alpha_au": 26.74939435109991,
+  "cross_core_determinant_abs": 0.9999718068766936,
+  "effective_active_min_sv": 0.999980703622251,
+  "effective_active_max_sv": 1.0000099317505553,
+  "plus_recovery_energy_error_hartree": 1.9065282685915008e-10,
+  "minus_recovery_energy_error_hartree": 1.949729266925715e-10
+}
+PAIR_DONE lambda=0.700
+PAIR_START lambda=0.725
+RECOVERY_PASS E=-387.113452954671516 dE=5.280e-10 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-387.113452954443915 dE=5.056e-10 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.725,
+  "field_au": 0.001,
+  "alpha_iso_au": 27.008205620404624,
+  "many_electron_overlap_abs": 0.9999637964392176,
+  "many_electron_fidelity": 0.999927594189133,
+  "g_ff_au": 18.1021080735611,
+  "delta_geom_hartree": 0.7459961433953446,
+  "closure_alpha_au": 27.008205620404624,
+  "cross_core_determinant_abs": 0.9999781108986004,
+  "effective_active_min_sv": 0.9999868786465281,
+  "effective_active_max_sv": 1.0000066720771401,
+  "plus_recovery_energy_error_hartree": 5.279616743791848e-10,
+  "minus_recovery_energy_error_hartree": 5.055653673480265e-10
+}
+PAIR_DONE lambda=0.725
+PAIR_START lambda=0.750
+RECOVERY_PASS E=-387.745853365360176 dE=1.587e-10 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-387.745853365365406 dE=1.591e-10 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.75,
+  "field_au": 0.001,
+  "alpha_iso_au": 27.789176328951726,
+  "many_electron_overlap_abs": 0.9999629319220983,
+  "many_electron_fidelity": 0.999925865218239,
+  "g_ff_au": 18.53438246993694,
+  "delta_geom_hartree": 0.7496655573506753,
+  "closure_alpha_au": 27.789176328951726,
+  "cross_core_determinant_abs": 0.9999820822148192,
+  "effective_active_min_sv": 0.9999895459254017,
+  "effective_active_max_sv": 1.0000047579190325,
+  "plus_recovery_energy_error_hartree": 1.5870682545937598e-10,
+  "minus_recovery_energy_error_hartree": 1.5910472939140163e-10
+}
+PAIR_DONE lambda=0.750
+PAIR_START lambda=0.800
+RECOVERY_PASS E=-388.642690877996245 dE=2.740e-10 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-388.642690878002099 dE=2.737e-10 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.8,
+  "field_au": 0.001,
+  "alpha_iso_au": 30.36379939658218,
+  "many_electron_overlap_abs": 0.9999573264071868,
+  "many_electron_fidelity": 0.9999146546354092,
+  "g_ff_au": 21.337251678418003,
+  "delta_geom_hartree": 0.7115208615947072,
+  "closure_alpha_au": 30.363799396582177,
+  "cross_core_determinant_abs": 0.9999871335579078,
+  "effective_active_min_sv": 0.9999917054325596,
+  "effective_active_max_sv": 1.0000031448169904,
+  "plus_recovery_energy_error_hartree": 2.7404212232795544e-10,
+  "minus_recovery_energy_error_hartree": 2.737010618147906e-10
+}
+PAIR_DONE lambda=0.800
+PAIR_START lambda=0.850
+RECOVERY_PASS E=-389.181583816829516 dE=6.809e-10 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-389.181583816684679 dE=5.600e-10 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.85,
+  "field_au": 0.001,
+  "alpha_iso_au": 33.83674379620061,
+  "many_electron_overlap_abs": 0.9999480521980632,
+  "many_electron_fidelity": 0.9998961070947004,
+  "g_ff_au": 25.974575635316075,
+  "delta_geom_hartree": 0.6513435343712567,
+  "closure_alpha_au": 33.83674379620061,
+  "cross_core_determinant_abs": 0.999990592201667,
+  "effective_active_min_sv": 0.9999924354900471,
+  "effective_active_max_sv": 1.0000019808162002,
+  "plus_recovery_energy_error_hartree": 6.808704711147584e-10,
+  "minus_recovery_energy_error_hartree": 5.599645191978198e-10
+}
+PAIR_DONE lambda=0.850
+PAIR_START lambda=0.900
+RECOVERY_PASS E=-389.479541084980042 dE=2.048e-09 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-389.479541084979701 dE=2.049e-09 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.9,
+  "field_au": 0.001,
+  "alpha_iso_au": 37.88902597534616,
+  "many_electron_overlap_abs": 0.9999350965412954,
+  "many_electron_fidelity": 0.9998701972950498,
+  "g_ff_au": 32.4527825126007,
+  "delta_geom_hartree": 0.5837561996515196,
+  "closure_alpha_au": 37.88902597534616,
+  "cross_core_determinant_abs": 0.9999927510297105,
+  "effective_active_min_sv": 0.9999926776232131,
+  "effective_active_max_sv": 1.0000011589071525,
+  "plus_recovery_energy_error_hartree": 2.0480683815549128e-09,
+  "minus_recovery_energy_error_hartree": 2.0488073460001033e-09
+}
+PAIR_DONE lambda=0.900
+PAIR_START lambda=0.950
+RECOVERY_PASS E=-389.618711197250491 dE=2.174e-09 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-389.618711197246398 dE=2.177e-09 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 0.95,
+  "field_au": 0.001,
+  "alpha_iso_au": 42.30421234296955,
+  "many_electron_overlap_abs": 0.9999186850336909,
+  "many_electron_fidelity": 0.9998373766795055,
+  "g_ff_au": 40.659136275126215,
+  "delta_geom_hartree": 0.5202300911744863,
+  "closure_alpha_au": 42.30421234296954,
+  "cross_core_determinant_abs": 0.9999941642800927,
+  "effective_active_min_sv": 0.999992774980171,
+  "effective_active_max_sv": 1.0000005803739427,
+  "plus_recovery_energy_error_hartree": 2.1740333977504633e-09,
+  "minus_recovery_energy_error_hartree": 2.1766481950180605e-09
+}
+PAIR_DONE lambda=0.950
+PAIR_START lambda=1.000
+RECOVERY_PASS E=-389.656299233057382 dE=-4.335e-10 ci_shape=(6188, 6188)
+RECOVERY_PASS E=-389.656299233053574 dE=-4.355e-10 ci_shape=(6188, 6188)
+{
+  "status": "PASS",
+  "lambda": 1.0,
+  "field_au": 0.001,
+  "alpha_iso_au": 46.988836743366846,
+  "many_electron_overlap_abs": 0.9998983965166403,
+  "many_electron_fidelity": 0.9997968033565483,
+  "g_ff_au": 50.80432267166643,
+  "delta_geom_hartree": 0.4624491999139723,
+  "closure_alpha_au": 46.988836743366846,
+  "cross_core_determinant_abs": 0.9999951445760478,
+  "effective_active_min_sv": 0.9999926514093282,
+  "effective_active_max_sv": 1.00000018007774,
+  "plus_recovery_energy_error_hartree": -4.3354475565138273e-10,
+  "minus_recovery_energy_error_hartree": -4.35534275311511e-10
+}
+PAIR_DONE lambda=1.000
+{
+  "status": "PASS",
+  "expected_points": [
+    0.65,
+    0.675,
+    0.7,
+    0.725,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "completed_points": [
+    0.65,
+    0.675,
+    0.7,
+    0.725,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "failures": [],
+  "summary_csv": "/scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/OsO4_def2TZVP_qgeom_summary.csv",
+  "minimum_alpha_grid_point": 0.7,
+  "minimum_alpha_grid_value_au": 26.74939435109991
+}
+
+ lambda   alpha_iso       g_FF       Delta_geom/Eh      |overlap|
+  0.650    29.67962    30.54823      0.48578288  0.9999389054
+  0.675    27.32514    21.04143      0.64931739  0.9999579180
+  0.700    26.74939    18.67741      0.71608956  0.9999626459
+  0.725    27.00821    18.10211      0.74599614  0.9999637964
+  0.750    27.78918    18.53438      0.74966556  0.9999629319
+  0.800    30.36380    21.33725      0.71152086  0.9999573264
+  0.850    33.83674    25.97458      0.65134353  0.9999480522
+  0.900    37.88903    32.45278      0.58375620  0.9999350965
+  0.950    42.30421    40.65914      0.52023009  0.9999186850
+  1.000    46.98884    50.80432      0.46244920  0.9998983965
+FULL_SCAN_DONE /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_CI_recovery/OsO4_def2TZVP_qgeom_summary.csv

@@ -1,0 +1,62 @@
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p650/plus/pyscf.out
+Overwritten attributes  get_hcore energy_nuc  of <class 'pyscf.scf.hf_symm.SymAdaptedRHF'>
+WARN: Weak orthogonality for localized orbitals 8.621185156181187e-09
+FIELD_DONE lambda=0.650 sign=plus E=-384.138316546189 min_sv=0.99996566 angle=0.4749deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p650/minus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 6.468512482536166e-09
+FIELD_DONE lambda=0.650 sign=minus E=-384.138316544738 min_sv=0.99996646 angle=0.4693deg
+POLAR_DONE lambda=0.650 alpha_iso=29.6796160910 dE_pm=-1.451e-09Eh min_sv=0.99996566
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p675/plus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 1.1801925942567082e-08
+FIELD_DONE lambda=0.675 sign=plus E=-385.344743493793 min_sv=0.99999114 angle=0.2412deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p675/minus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 1.0599120305710585e-08
+FIELD_DONE lambda=0.675 sign=minus E=-385.344743494312 min_sv=0.99999097 angle=0.2434deg
+POLAR_DONE lambda=0.675 alpha_iso=27.3251387171 dE_pm=5.191e-10Eh min_sv=0.99999097
+FIELD_RESUME lambda=0.700 sign=plus E=-386.323821181241
+FIELD_RESUME lambda=0.700 sign=minus E=-386.323821181137
+POLAR_DONE lambda=0.700 alpha_iso=26.7493943511 dE_pm=-1.033e-10Eh min_sv=0.99999512
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p725/plus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 4.412611928282473e-09
+FIELD_DONE lambda=0.725 sign=plus E=-387.113452955199 min_sv=0.99999668 angle=0.1477deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p725/minus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 7.214601784645588e-09
+FIELD_DONE lambda=0.725 sign=minus E=-387.113452954949 min_sv=0.99999673 angle=0.1465deg
+POLAR_DONE lambda=0.725 alpha_iso=27.0082056204 dE_pm=-2.500e-10Eh min_sv=0.99999668
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p750/plus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 1.442888840793056e-08
+FIELD_DONE lambda=0.750 sign=plus E=-387.745853365519 min_sv=0.99999738 angle=0.1311deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p750/minus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 5.858219843947392e-09
+FIELD_DONE lambda=0.750 sign=minus E=-387.745853365525 min_sv=0.99999738 angle=0.1311deg
+POLAR_DONE lambda=0.750 alpha_iso=27.7891763290 dE_pm=5.627e-12Eh min_sv=0.99999738
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p800/plus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 6.754883579312368e-09
+FIELD_DONE lambda=0.800 sign=plus E=-388.642690878270 min_sv=0.99999793 angle=0.1167deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p800/minus/pyscf.out
+FIELD_DONE lambda=0.800 sign=minus E=-388.642690878276 min_sv=0.99999793 angle=0.1167deg
+POLAR_DONE lambda=0.800 alpha_iso=30.3637993966 dE_pm=5.514e-12Eh min_sv=0.99999793
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p850/plus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 3.716548533509603e-09
+FIELD_DONE lambda=0.850 sign=plus E=-389.181583817510 min_sv=0.99999810 angle=0.1116deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p850/minus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 3.9005348878712255e-09
+FIELD_DONE lambda=0.850 sign=minus E=-389.181583817245 min_sv=0.99999812 angle=0.1112deg
+POLAR_DONE lambda=0.850 alpha_iso=33.8367437962 dE_pm=-2.657e-10Eh min_sv=0.99999810
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p900/plus/pyscf.out
+FIELD_DONE lambda=0.900 sign=plus E=-389.479541087028 min_sv=0.99999817 angle=0.1096deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p900/minus/pyscf.out
+WARN: Weak orthogonality for localized orbitals 2.931961513439441e-09
+FIELD_DONE lambda=0.900 sign=minus E=-389.479541087029 min_sv=0.99999817 angle=0.1096deg
+POLAR_DONE lambda=0.900 alpha_iso=37.8890259753 dE_pm=3.979e-13Eh min_sv=0.99999817
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p950/plus/pyscf.out
+FIELD_DONE lambda=0.950 sign=plus E=-389.618711199425 min_sv=0.99999819 angle=0.1089deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_0p950/minus/pyscf.out
+FIELD_DONE lambda=0.950 sign=minus E=-389.618711199423 min_sv=0.99999819 angle=0.1089deg
+POLAR_DONE lambda=0.950 alpha_iso=42.3042123430 dE_pm=-1.478e-12Eh min_sv=0.99999819
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_1p000/plus/pyscf.out
+FIELD_DONE lambda=1.000 sign=plus E=-389.656299232624 min_sv=0.99999816 angle=0.1098deg
+output file: /scr/zdb/lambda_1_symmetry/OsO4_CAS24_def2TZVP_F1em3/lambda_1p000/minus/pyscf.out
+FIELD_DONE lambda=1.000 sign=minus E=-389.656299232618 min_sv=0.99999816 angle=0.1098deg
+POLAR_DONE lambda=1.000 alpha_iso=46.9888367434 dE_pm=-5.798e-12Eh min_sv=0.99999816
+FINITE_FIELD_DONE mode=compression points=[0.65, 0.675, 0.7, 0.725, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
