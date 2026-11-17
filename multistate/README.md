@@ -1,6 +1,6 @@
 # Multistate quantum geometry and molecular response
 
-Data, analysis scripts, and Supplementary Material for **Multistate Quantum
+Public numerical data, analysis scripts, and supporting PDF for **Multistate Quantum
 Geometry Distinguishes Physical Response from Electronic-State Switching**,
 by Hui Li and Dongbo Zhao. Revision: **22 October 2026**.
 
@@ -8,10 +8,11 @@ This directory is the multistate study of C2, B2, and the H + O2 / OH + O
 reaction geometries. The repository's root `data/` and `response_data.zip`
 belong to the separate single-state response study.
 
+The manuscript and Supplementary Material LaTeX source files are **not publicly distributed**. The public repository is for data and reproducibility materials only.
+
 ## Start here
 
 - [Supplementary Material (PDF)](supporting_information/JCP_Supporting_Information.pdf)
-- [Supplementary Material (LaTeX)](supporting_information/JCP_Supporting_Information.tex)
 - [Main-text/SI reference map](docs/SI_CROSS_REFERENCES.md)
 - [Claim-to-file index](docs/CLAIM_EVIDENCE.md)
 - [Data definitions and scientific scope](docs/DATA_DICTIONARY.md)
