@@ -25,7 +25,7 @@ belong to the separate single-state response study.
 
 ## B2 original-wavefunction archive preparation
 
-[Wavefunction audit and Zenodo release instructions](docs/B2_WAVEFUNCTION_RELEASE.md) document the 234 reconstructed signed-field checkpoints, 117 pairs, and the read-only archive-building script. Raw HDF5 wavefunctions remain on the research server until separately deposited on Zenodo; they are **not yet part of this GitHub repository**.
+[Wavefunction audit and Zenodo release instructions](docs/B2_WAVEFUNCTION_RELEASE.md) document the 234 reconstructed signed-field checkpoints, 117 pairs, and the read-only archive-building script. The archived B2 HDF5 wavefunctions are separate from this GitHub repository. The author supplied a [Zenodo record DOI](https://doi.org/10.5281/zenodo.24304811) (10.5281/zenodo.24304811); remote file contents have not yet been independently checked.
 
 ## Reproduce the reported analyses
 
