@@ -407,29 +407,77 @@ The field-refinement table and full numerical reports are stored under
 \ce{C2} crossings and overlap minima from the point and edge tables,
 checks the \ce{B2} inventories and coupling ratios, and reconstructs
 the reaction internal contribution and local peak margins. These are
-checks of the distributed numerical records. They do not reconstruct
-unavailable production wave functions.
+checks of the distributed numerical records. They independently check the published tables rather than reconstructing
+production wavefunctions; the separately deposited wavefunction archives
+provide additional source records.
 
 \section{Data access and reproducibility scope}\label{sec:data}
 The \href{https://github.com/zzdbl520/quantum-geometry-response-data/tree/main/multistate}{public reproducibility repository}
-contains the molecular tables, available production and analysis scripts,
-the source reaction geometries, figure-generation scripts, verification
-reports, and this Supplementary Material. Its claim-to-file index identifies
-which records support each main-text result. The current \ce{C2}, \ce{B2},
-and reaction plots can be regenerated from the included tables without
-performing new electronic-structure calculations.
+contains the supporting molecular tables, production and analysis scripts,
+source reaction geometries, figure-generation scripts, verification reports,
+and this Supplementary Material. The claim-to-file index relates the
+distributed evidence to the main-text results. Figures and tabulated
+quantities can be regenerated from the deposited numerical records without
+repeating electronic-structure calculations.
 
-The deposit preserves historical evidence files unchanged. Their older
-status labels and server-specific paths describe the source calculation;
-the current README and data dictionary define their use in this revision.
-In particular, the older \ce{B2} seven-geometry figure is retained for
-provenance and is not the current main-text figure.
+Original CASSCF wavefunction checkpoints and associated computational
+records for all three applications are archived in a
+\href{https://doi.org/10.5281/zenodo.24304811}{single Zenodo record
+(DOI: 10.5281/zenodo.24304811)}. The archives distinguish the original
+electronic-structure protocols; the existence of a converged checkpoint
+does not by itself establish convergence of a response extrapolation
+or equivalence between different orbital-optimization protocols.
 
-Not every production checkpoint, signed-field wave function, or original
-environment is present. Some original workflows require those missing
-inputs. The documented reproduction commands therefore cover the
-distributed-table analysis, figures, and finite-dimensional theory checks.
-They do not claim a complete clean-environment rerun of all CASSCF jobs.
+\paragraph*{\texorpdfstring{\ce{C2}}{C2} wavefunctions.}
+The global SA6-CASSCF(8e,8o) archive contains 119 zero-field checkpoints
+and 888 signed-field checkpoints covering 54 finite-field geometries and
+444 complete positive--negative field pairs. Additional local-transport,
+crossing-field, and longitudinal orbital-continuity control records are
+included. File inventory, checkpoint structure, field pairing, and
+per-file SHA256 integrity were checked; those checks are not an independent
+recalculation of every many-electron overlap or response observable.
+
+\paragraph*{\texorpdfstring{\ce{B2}}{B2} wavefunctions.}
+The SA3-CASSCF(6e,8o) archive contains 13 zero-field and 234
+signed-field checkpoints, representing 117 complete positive--negative
+field pairs over 13 geometries. Original molecular-orbital and CI
+coefficients were used to reconstruct the zero-to-field overlap
+matrices with the production frame-overlap implementation.
+The maximum Frobenius difference against the stored overlaps was
+$1.1434\times10^{-15}$. This verifies consistency with the stored
+production records, rather than agreement between independent
+algorithms or a clean-environment rerun of the CASSCF jobs.
+
+\paragraph*{H + \texorpdfstring{\ce{O2}}{O2} reaction wavefunctions.}
+The archived SA2, SA4 manifold, and state-specific protocols contain
+respectively 273, 169, and 157 HDF5 checkpoints, for a total of
+599 wavefunction files (63 zero-field and 536 signed-field).
+The protocols contain 126, 74, and 68 complete positive--negative
+field pairs, respectively. All 599 checkpoints passed the archival
+structural checks and carry distinct SHA256 hashes, with no unmatched
+signed-field pairs; the stored convergence flags were true. The SA4
+finite-field checkpoints span 14 IRC geometries, whereas the
+reported four-field response table uses 56 field pairs. The wider
+source inventory must not be confused with the accepted response
+subset. As stated in Sec.~\ref{sec:computational}, full-matrix
+extrapolation and response-range failures remain part of the
+original numerical evidence.
+
+\paragraph*{Verification boundary.}
+The GitHub scripts provide the documented table-level, figure-level,
+and finite-dimensional checks. The wavefunction archives additionally
+allow inspection of original orbitals, CI vectors, electronic-state
+energies, selected overlap records, and computational provenance.
+Neither the archival integrity checks nor the selected overlap
+reconstructions establish a complete independent rerun of all original
+CASSCF optimizations and hybrid-response analyses.
+
+Historical evidence files retain their original statuses, labels,
+and server-specific paths for provenance. The current README,
+data dictionary, and system-specific archive notes define which
+records support the present revision. In particular, the older
+seven-geometry \ce{B2} plot is retained as historical evidence and
+does not supersede the current 13-geometry figure.
 
 \bibliography{aipsamp,additional}
 \end{document}
