@@ -1,6 +1,6 @@
 # B2 wavefunction release and audit (JCP multistate study)
 
-The source SA3-CASSCF wavefunctions currently reside on the research server and **are not yet deposited on GitHub or Zenodo**. This guide describes the verified reconstruction results and how to prepare a separate Zenodo archive without altering source files.
+The source SA3-CASSCF wavefunctions are stored on the research server and were packaged for Zenodo. **The author-provided Zenodo record DOI is [10.5281/zenodo.24304811](https://doi.org/10.5281/zenodo.24304811).** The record contents and remote file checksum have not yet been independently verified here. This guide describes the verified reconstruction results and how to prepare a separate Zenodo archive without altering source files.
 
 ## Completed audit (17 November 2026)
 
@@ -15,7 +15,7 @@ The source SA3-CASSCF wavefunctions currently reside on the research server and 
 
 **GitHub** is for scripts, config templates, manifest / pair mapping CSVs, audit reports, figure scripts, and derived analysis data. **Zenodo** is for the raw HDF5 checkpoints and source-task records (plus matching scripts/configs and checksums).
 
-The raw `*.h5` files are not in GitHub and must not be described as publicly deposited until the upload is complete. The full dataset should be assigned its Zenodo DOI only after the record has been deposited and verified.
+The raw `*.h5` files are not stored in GitHub. Zenodo DOI provided by the author: **[10.5281/zenodo.24304811](https://doi.org/10.5281/zenodo.24304811)**. Check the Zenodo record lists `B2_SA3_wavefunctions_v1.tar.gz` and compare the downloaded archive SHA256 with the local digest before claiming that remote files are verified.
 
 ## On the server
 
@@ -41,3 +41,11 @@ For extra rigor, extract the archive to a temporary directory and run `sha256sum
 5. Only then update main-text DAS and SI S8 to describe the **specific** newly available B2 wavefunction materials. C2 and HO2 limitations remain separate.
 
 No production wavefunctions have been copied to GitHub as part of this repository update.
+
+## Prepared archive and record identifier (17 November 2026)
+
+- Zenodo DOI (author-provided): https://doi.org/10.5281/zenodo.24304811
+- Local archive: `B2_SA3_wavefunctions_v1.tar.gz` (26,736,510 bytes)
+- Local archive SHA256: `5fa267e9de58888831e41afbe149cd43b980c68b27fb6575c1f9b3cc16d839ca`
+- 505 archived source files passed SHA256 after extraction (exit code 0).
+- Remote Zenodo file presence and checksum: **not independently verified** during this update.
